@@ -9,7 +9,7 @@ var shipmentInfoschema = new Schema({
     origin :{type: String, required:true},
     destination :{type: String, required:true},
     deadline :{type: Date, required:true},
-    warehouseUser :{type: String, required:true},
+    warehouseUser :{type: mongoose.Schema.Types.ObjectId, ref: 'WarehouseUser', required: true},
     status :{type: String, required:true},
 }, {timestamps: true});
 
