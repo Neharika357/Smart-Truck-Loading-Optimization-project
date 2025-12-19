@@ -1,26 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {  Plus, Search} from 'lucide-react';
 import Navbar from '../components/navbar-trucks';
 import '../styles/trucks.css';
 
 const TruckDashboard = () => {
   
-  const [trucks] = useState([
-    { id: '#T101', capKg: 3000, capM3: 20, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T102', capKg: 3000, capM3: 20, route: 'Hyderabad → Chennai', cost: 30, status: 'In Use' },
-    { id: '#T103', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T104', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'In Use' },
-    { id: '#T105', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'In Use' },
-    { id: '#T106', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T107', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T108', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'In Use' },
-    { id: '#T109', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T110', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T111', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'In Use' },
-    { id: '#T112', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-    { id: '#T113', capKg: 3000, capM3: 10, route: 'Hyderabad → Chennai', cost: 30, status: 'Available' },
-  ]);
   
+  const [trucks, setTrucks] = useState([]); // Start with empty array
+  
+  // Form States
+  const [formData, setFormData] = useState({
+    weight: '',
+    volume: '',
+    from: '',
+    to: '',
+    price: '',
+    type: 'Box Truck'
+  });
+
+  const username = "#T01"
+
+  useEffect(() => {
+    const fetchTrucks = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/truck`, {
+            params: { username: username }
+        });
+        setTrucks(response.data);
+      } catch (err) {
+        console.error("Error fetching trucks:", err);
+      }
+    };
+    fetchTrucks();
+  }, []);
+
+  const handleRegister = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/create-truck', {
+        ...formData,
+        username: username
+      });
+      
+      // Update UI by adding the new truck to the top of the list
+      setTrucks([response.data.TrucksInfo, ...trucks]);
+      
+      // Reset Form
+      setFormData({ weight: '', volume: '', from: '', to: '', price: '', type: 'Box Truck' });
+      alert("Truck Registered Successfully!");
+    } catch (err) {
+      alert("Failed to register truck");
+    }
+  };
 
   return (
     <div className="dashboard-wrapper">
@@ -37,37 +68,53 @@ const TruckDashboard = () => {
               <div className="input-row">
                 <div className="input-field">
                   <label>Weight (KG)</label>
-                  <input type="number" placeholder="3000" />
+                  <input 
+                    type="number" value={formData.weight} 
+                    onChange={(e) => setFormData({...formData, weight: e.target.value})} 
+                    placeholder="3000" 
+                  />
                 </div>
                 <div className="input-field">
                   <label>Volume (M<sup>3</sup>)</label>
-                  <input type="number" placeholder="20" />
+                  <input 
+                    type="number"  value= {formData.volume}
+                    onChange={(e) =>setFormData({...formData, volume: e.target.value})} placeholder="20" 
+                  />
                 </div>
               </div>
 
-              <div className="input-field">
+              <div 
+                className="input-field" 
+              >
                 <label>Vehicle Type</label>
-                <select>
+                <select value={formData.type}
+                onChange={(e) => setFormData({...formData, type : e.target.value})}>
                   <option>Box Truck</option>
                   <option>Refrigerated</option>
                   <option>Flatbed</option>
                 </select>
               </div>
 
-              <div className="input-field">
-                <label>Primary Service Route </label>
-                <div className="input-with-icon">
-                  
-                  <input type="text" placeholder="e.g. Hyderabad to Chennai" />
+              <div className="input-field2">
+                <div className="input-field">
+                  <label>From</label>
+                  <input type="string" value={formData.from}
+                onChange={(e) => setFormData({...formData, from : e.target.value})}placeholder="e.g. Hyderabad" />
+                </div>
+                 <div className="input-field">
+                  <label>To</label>
+                  <input type="String" value={formData.to}
+                onChange={(e) => setFormData({...formData, to : e.target.value})}placeholder="e.g. Chennai" />
                 </div>
               </div>
 
               <div className="input-field">
                 <label>Price per KM (₹)</label>
-                <input type="number" placeholder="30" />
+                <input type="number" value={formData.price}
+                onChange={(e) => setFormData({...formData, price : e.target.value})} placeholder="30" />
               </div>
 
-              <button className="submit-btn">
+              <button className="submit-btn" onClick={handleRegister}>
                 <Plus size={20} /> Register Truck
               </button>
             </div>
@@ -87,20 +134,20 @@ const TruckDashboard = () => {
 
             <div className="truck-grid">
               {trucks.map((truck) => (
-                <div key={truck.id} className="truck-wrapper">
+                <div key={truck._id} className="truck-wrapper">
                     <div  className={`truck-card-mini `} >
                     <div className="truck-card-top">
-                        <span className="truck-tag">{truck.id}</span>
+                        <span className="truck-tag">{truck.truckId}</span>
                         <span className={`status-pill ${truck.status.toLowerCase().replace(' ', '-')}`}>
                         {truck.status}
                         </span>
                     </div>
                     <div className="truck-card-details">
-                        <p><strong>{truck.route}</strong></p>
+                        <p><strong>{truck.route.from} → {truck.route.to}</strong></p>
                         <div className="specs">
-                        <span>{truck.capKg}kg</span>
-                        <span>{truck.capM3}m^3</span>
-                        <span>₹{truck.cost}/km</span>
+                        <span>{truck.capacityWeight}kg</span>
+                        <span>{truck.capacityVolume}m^3</span>
+                        <span>₹{truck.pricePerKm}/km</span>
                         </div>
                     </div>
                     </div>    

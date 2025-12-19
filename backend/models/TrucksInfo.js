@@ -18,6 +18,10 @@ const truckSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  truckType :{
+    type: String,
+    required: true
+  },
   route: { // Matches 'route'
     from: { type: String, required: true },
     to: { type: String, required: true }
