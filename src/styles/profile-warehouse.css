@@ -1,0 +1,192 @@
+/* --- VARIABLES & BASE --- */
+:root {
+  --primary: #10b981; /* Changed to Green to match your Warehouse theme */
+  --primary-light: #d1fae5;
+  --dark: #064e3b;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --bg-subtle: #f3f4f6;
+}
+
+body {
+  padding-bottom: 50px;
+  background-color: var(--bg-subtle);
+  margin: 0;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.profile-wrapper {
+  background-color: var(--bg-subtle);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* --- HERO SECTION --- */
+.profile-main {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.profile-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+}
+
+.hero-content { display: flex; align-items: center; gap: 1.5rem; }
+
+.profile-avatar {
+  position: relative;
+  width: 90px;
+  height: 90px;
+}
+
+.avatar-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary), var(--dark));
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 800;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  border: 3px solid white;
+  border-radius: 50%;
+}
+
+.hero-details h1 { font-size: 2.25rem; font-weight: 800; margin: 0 0 0.5rem 0; color: #111827; }
+.hero-badges { display: flex; gap: 1.5rem; }
+.badge-item { color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+
+/* --- STATS GRID --- */
+.dashboard-grid-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card-pro {
+  background: var(--surface);
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.stat-icon-wrap { padding: 12px; border-radius: 14px; }
+.stat-icon-wrap.blue { background: #ebf8ff; color: #3182ce; }
+.stat-icon-wrap.emerald { background: #f0fff4; color: #38a169; }
+.stat-icon-wrap.forest { background: #f7fafc; color: var(--dark); }
+
+.stat-info label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
+.stat-info h3 { font-size: 1.75rem; font-weight: 800; margin: 0; color: #111827; }
+
+/* --- PANELS & LISTS --- */
+.content-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+.glass-panel { 
+  background: var(--surface); 
+  border-radius: 20px; 
+  border: 1px solid var(--border); 
+  padding: 1.5rem; 
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.panel-header h3 { font-size: 1.1rem; font-weight: 700; margin: 0; color: #111827; }
+.header-icon { color: var(--text-muted); }
+
+.fleet-grid { display: flex; flex-direction: column; gap: 10px; }
+
+.fleet-item-pro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-subtle);
+  border-radius: 12px;
+}
+
+.fleet-name { display: block; font-weight: 700; font-size: 0.9rem; color: #1f2937; }
+.fleet-cat { font-size: 0.75rem; color: var(--text-muted); }
+.fleet-badge { background: var(--primary); color: white; padding: 2px 10px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; }
+
+/* --- TIMELINE --- */
+.activity-timeline { padding-top: 10px; }
+.timeline-item { position: relative; padding-left: 24px; padding-bottom: 24px; }
+.timeline-marker { position: absolute; left: 0; top: 6px; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; z-index: 2; }
+.timeline-item::after { content: ''; position: absolute; left: 4.5px; top: 16px; width: 1px; height: calc(100% - 10px); background: var(--border); }
+.timeline-item:last-child::after { display: none; }
+
+.timeline-content p { font-size: 0.9rem; margin: 0 0 4px 0; color: #374151; }
+.timeline-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+/* --- TABLE --- */
+.history-table-section { overflow: hidden; }
+.table-wrapper { overflow-x: auto; }
+
+.pro-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  table-layout: auto; 
+}
+
+.pro-table th {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.pro-table td {
+  padding: 16px 15px;
+  background: var(--surface);
+  vertical-align: middle;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.pro-table td:first-child { border-left: 1px solid var(--border); border-radius: 12px 0 0 12px; }
+.pro-table td:last-child { border-right: 1px solid var(--border); border-radius: 0 12px 12px 0; }
+.pro-table td.bold { font-weight: 800; color: #111827; }
+
+/* --- BUTTONS --- */
+.view-all-trigger { background: none; border: none; color: var(--primary); font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.edit-profile-btn { background: white; color: var(--primary); border: 1.5px solid var(--primary); padding: 8px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.edit-profile-btn:hover { background: var(--primary-light); }
+.row-action-btn { background: white; border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+.row-action-btn:hover { background: #1f2937; color: white; }
+
+/* --- STATUS PILLS --- */
+.status-pill-pro { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-block; }
+
+/* Warehouse Specific Status Colors */
+.status-pill-pro.processing { background: #feebc8; color: #744210; } /* Orange */
+.status-pill-pro.stored { background: #e9d8fd; color: #553c9a; } /* Purple */
+.status-pill-pro.inbound { background: #bee3f8; color: #2c5282; } /* Blue */
+.status-pill-pro.dispatched { background: #c6f6d5; color: #22543d; } /* Green */
