@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/navbar-shipment'; // Ensure capitalized if your file is Navbar.js
+import Navbar from '../components/navbar-shipment'; 
 import CreateShipment from '../components/createShipment';
 import ShipmentList from '../components/shipmentList';
 import TruckSelectionModal from '../components/truckSelectionModel';
 import { CheckCircle } from 'lucide-react';
 import '../styles/shipments.css';
 
-// --- 1. USER CONSTANT (Must match a user in your MongoDB) ---
 const CURRENT_USER = "Warehouse1"; 
 
 const WarehouseDashboard = () => {
-  const [shipments, setShipments] = useState([]); // Start empty, load from DB
+  const [shipments, setShipments] = useState([]); 
   const [notifications, setNotifications] = useState([]);
   const [modalData, setModalData] = useState(null); 
   const [feedbackMsg, setFeedbackMsg] = useState(null);
 
-  // --- 2. FETCH DATA FROM DB ON LOAD ---
   useEffect(() => {
     fetchShipments();
   }, []);
@@ -31,7 +29,6 @@ const WarehouseDashboard = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Map backend 'sid' to frontend 'id'
         const formattedData = data.map(item => ({
           ...item,
           id: item.sid, 
@@ -45,7 +42,6 @@ const WarehouseDashboard = () => {
     }
   };
 
-  // --- 3. ADD SHIPMENT (CONNECTS TO BACKEND) ---
   const handleAddShipment = async (formData) => {
     try {
       const response = await fetch('http://localhost:5000/create-shipment', {
@@ -61,7 +57,6 @@ const WarehouseDashboard = () => {
       const result = await response.json();
 
       if (response.ok) {
-        // Success! Reload data and show your nice feedback UI
         fetchShipments(); 
         triggerFeedback("Shipment Created Successfully!");
       } else {
@@ -73,7 +68,6 @@ const WarehouseDashboard = () => {
     }
   };
 
-  // Helper to show your popup for 2.5 seconds
   const triggerFeedback = (msg) => {
     setFeedbackMsg(msg);
     setTimeout(() => setFeedbackMsg(null), 2500);
@@ -83,15 +77,9 @@ const WarehouseDashboard = () => {
     setModalData(shipment); 
   };
 
-  // --- 4. BOOK TRUCK LOGIC (Keeps your Optimistic UI) ---
   const handleBookTruck = (truckId) => {
-    // Show your nice feedback UI
     triggerFeedback(`Booking Request Sent to ${truckId}!`);
-    
-    // Close modal
     setModalData(null); 
-
-    // Update Local State (Visual only, until backend is fully integrated for bookings)
     const updatedShipments = shipments.map(s => {
       if (s.id === modalData.id) {
         return { ...s, status: 'Requested', requestedTruck: truckId };
@@ -99,8 +87,6 @@ const WarehouseDashboard = () => {
       return s;
     });
     setShipments(updatedShipments);
-
-    // Add Notification
     const newNotif = { 
       title: 'Request Sent', 
       msg: `Waiting for approval on ${truckId} for ${modalData.id}`, 
@@ -132,7 +118,6 @@ const WarehouseDashboard = () => {
         />
       )}
 
-      {/* YOUR NICE FEEDBACK POPUP */}
       {feedbackMsg && (
         <div className="modal-overlay blur-bg intense animate-fade-in">
           <div className="verification-box glass-card feedback-popup">
@@ -151,7 +136,6 @@ const WarehouseDashboard = () => {
   );
 };
 
-// --- YOUR ORIGINAL STYLES (Preserved) ---
 const styles = {
   mainContent: {
     minHeight: 'calc(100vh - 90px)',

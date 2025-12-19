@@ -2,8 +2,6 @@ import React from 'react';
 import { FaLeaf, FaRupeeSign, FaRoute, FaTruck } from 'react-icons/fa';
 
 const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
-  
-  // Mock Optimization Results
   const suggestedTrucks = [
     { 
       id: 'T-105', dealer: 'Speed Logistics', match: 98, cost: 12000, 
@@ -40,11 +38,9 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
           </p>
         </div>
 
-        {/* Grid Container */}
         <div style={styles.grid}>
           {suggestedTrucks.map((truck) => (
             
-            // HERE IS THE CHANGE: using className="truck-card"
             <div key={truck.id} className="truck-card">
               
               <div style={styles.matchBadge}>
@@ -90,14 +86,12 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
   );
 };
 
-// --- STYLES ---
-// (We removed 'card' from here because it's now in App.css)
 const styles = {
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
     gap: '30px', 
-    rowGap: '60px', // The Big Gap you wanted
+    rowGap: '60px', 
     backgroundColor: '#f9fafb', 
     padding: '30px', 
     borderRadius: '8px',

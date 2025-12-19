@@ -14,7 +14,6 @@ const CreateShipment = ({ onAddShipment }) => {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = () => {
-    // Now this check will pass because state is actually updating!
     if (!form.origin || !form.destination || !form.weight || !form.date) {
         return alert("Please fill all details");
     }
@@ -34,7 +33,6 @@ const CreateShipment = ({ onAddShipment }) => {
           <div className="input-row">
             <div className="input-field">
               <label>Weight (KG)</label>
-              {/* FIXED: Added name, value, onChange */}
               <input
                 type="number"
                 name="weight"
@@ -45,7 +43,6 @@ const CreateShipment = ({ onAddShipment }) => {
             </div>
             <div className="input-field">
               <label>Volume (M<sup>3</sup>)</label>
-              {/* FIXED: Added name, value, onChange */}
               <input
                 type="number"
                 name="volume"
@@ -58,7 +55,6 @@ const CreateShipment = ({ onAddShipment }) => {
 
           <div className="input-field">
             <label>Origin</label>
-            {/* FIXED: Changed type to 'text' AND added connections */}
             <input
               type="text"
               name="origin"
@@ -71,7 +67,6 @@ const CreateShipment = ({ onAddShipment }) => {
           <div className="input-field">
             <label>Destination</label>
             <div className="input-with-icon">
-              {/* FIXED: Added name, value, onChange */}
               <input
                 type="text"
                 name="destination"
@@ -84,7 +79,6 @@ const CreateShipment = ({ onAddShipment }) => {
 
           <div className="input-field">
             <label>Deadline</label>
-            {/* FIXED: Added name, value, onChange */}
             <input
               name="date"
               type="date"

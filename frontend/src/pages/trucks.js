@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {  Plus, Search} from 'lucide-react';
+import {  Plus, Search, CheckCircle} from 'lucide-react';
 import Navbar from '../components/navbar-trucks';
 import '../styles/trucks.css';
 
 const TruckDashboard = () => {
+  const [trucks, setTrucks] = useState([]); 
+  const [showSuccess, setShowSuccess] = useState(false);
   
-  
-  const [trucks, setTrucks] = useState([]); // Start with empty array
-  
-  // Form States
   const [formData, setFormData] = useState({
     weight: '',
     volume: '',
@@ -42,14 +40,12 @@ const TruckDashboard = () => {
         username: username
       });
       
-      // Update UI by adding the new truck to the top of the list
       setTrucks([response.data.TrucksInfo, ...trucks]);
-      
-      // Reset Form
       setFormData({ weight: '', volume: '', from: '', to: '', price: '', type: 'Box Truck' });
-      alert("Truck Registered Successfully!");
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2500);
     } catch (err) {
-      alert("Failed to register truck");
+      alert("Error: " + err);
     }
   };
 
@@ -62,8 +58,7 @@ const TruckDashboard = () => {
             <div className="card-header-main">
               <h3>Add New Truck</h3>
               <p>Register vehicle to the fleet</p>
-            </div>
-            
+            </div>  
             <div className="form-body">
               <div className="input-row">
                 <div className="input-field">
@@ -82,7 +77,6 @@ const TruckDashboard = () => {
                   />
                 </div>
               </div>
-
               <div 
                 className="input-field" 
               >
@@ -94,7 +88,6 @@ const TruckDashboard = () => {
                   <option>Flatbed</option>
                 </select>
               </div>
-
               <div className="input-field2">
                 <div className="input-field">
                   <label>From</label>
@@ -107,20 +100,17 @@ const TruckDashboard = () => {
                 onChange={(e) => setFormData({...formData, to : e.target.value})}placeholder="e.g. Chennai" />
                 </div>
               </div>
-
               <div className="input-field">
                 <label>Price per KM (₹)</label>
                 <input type="number" value={formData.price}
                 onChange={(e) => setFormData({...formData, price : e.target.value})} placeholder="30" />
               </div>
-
               <button className="submit-btn" onClick={handleRegister}>
                 <Plus size={20} /> Register Truck
               </button>
             </div>
           </div>
         </aside>
-
         
         <section className="display-area">
           <div className="glass-card">
@@ -131,7 +121,6 @@ const TruckDashboard = () => {
                 <input type="text" placeholder="Search ID or Route..." />
               </div>
             </div>
-
             <div className="truck-grid">
               {trucks.map((truck) => (
                 <div key={truck._id} className="truck-wrapper">
@@ -157,6 +146,20 @@ const TruckDashboard = () => {
           </div>
         </section>
       </main>
+      {showSuccess && (
+        <div className="modal-overlay blur-bg intense animate-fade-in">
+          <div className="verification-box glass-card feedback-popup">
+            <div className="feedback-view">
+              <div className="success-icon-animate">
+                <CheckCircle color="#2d6a4f" size={80} strokeWidth={1.5} />
+              </div>
+              <h3>Truck Registered!</h3>
+              <p>Vehicle has been added to the active fleet.</p>
+              <span className="sub-text">Updating your dashboard...</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -6,7 +6,6 @@ import Navbar from '../components/navbar-shipment';
 const WarehouseProfile = () => {
   const [showAllHistory, setShowAllHistory] = useState(false);
 
-  // Warehouse specific user info
   const [userInfo] = useState({
     name: "Central Hub Hyderabad",
     email: "manager.hyd@smarttruck.com",
@@ -16,7 +15,6 @@ const WarehouseProfile = () => {
     pendingRequests: 14
   });
 
-  // Storage Type Breakdown (Replaces Fleet Composition)
   const [storageStats] = useState([
     { type: "Dry Goods Zone", count: "4,500 m³", category: "General" },
     { type: "Cold Storage A", count: "1,200 m³", category: "Perishable" },
@@ -24,7 +22,6 @@ const WarehouseProfile = () => {
     { type: "Docking Bay", count: "12 Trucks", category: "Active" }
   ]);
 
-  // Shipment History Data
   const [shipmentHistory] = useState([
     { id: "S124", type: "Electronics", route: "Hyd → Mumbai", status: "Processing", date: "19 Dec 2025", weight: "750 kg" },
     { id: "S123", type: "Textiles", route: "Hyd → Delhi", status: "Dispatched", date: "18 Dec 2025", weight: "1200 kg" },
@@ -42,11 +39,9 @@ const WarehouseProfile = () => {
       <Navbar notifications={[]} /> 
 
       <main className="profile-main">
-        {/* Header Profile Section */}
         <header className="profile-hero">
           <div className="hero-content">
             <div className="profile-avatar">
-              {/* Changed color gradient to match Green theme more closely if desired */}
               <div className="avatar-inner" style={{ background: 'linear-gradient(135deg, #10b981, #064e3b)' }}>
                 {userInfo.name.charAt(0)}
               </div>
@@ -63,7 +58,6 @@ const WarehouseProfile = () => {
           <button className="edit-profile-btn">Edit Details</button>
         </header>
 
-        {/* Stats Grid - Adapted for Warehouse */}
         <section className="dashboard-grid-row">
           <div className="stat-card-pro">
             <div className="stat-icon-wrap blue"><Warehouse size={24} /></div>
@@ -88,10 +82,7 @@ const WarehouseProfile = () => {
           </div>
         </section>
 
-        {/* Split Section: Storage Breakdown & Recent Activity */}
         <div className="content-split">
-          
-          {/* Left Panel: Storage Types */}
           <section className="glass-panel fleet-overview">
             <div className="panel-header">
               <h3>Storage Breakdown</h3>
@@ -110,7 +101,6 @@ const WarehouseProfile = () => {
             </div>
           </section>
 
-          {/* Right Panel: Recent Activity Timeline */}
           <section className="glass-panel recent-orders">
             <div className="panel-header">
               <h3>Recent Activity Log</h3>
@@ -130,7 +120,6 @@ const WarehouseProfile = () => {
           </section>
         </div>
 
-        {/* Main Data Table: Shipment History */}
         <section className="glass-panel history-table-section">
           <div className="panel-header">
             <h3>Shipment Management History</h3>

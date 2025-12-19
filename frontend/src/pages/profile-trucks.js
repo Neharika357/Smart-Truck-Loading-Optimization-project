@@ -42,7 +42,6 @@ const Profile = () => {
      <Navbar />
 
       <main className="profile-main">
-        {/* Header Profile Section */}
         <header className="profile-hero">
           <div className="hero-content">
             <div className="profile-avatar">
@@ -59,7 +58,6 @@ const Profile = () => {
           <button className="edit-profile-btn">Edit Profile</button>
         </header>
 
-        {/* Stats Grid */}
         <section className="dashboard-grid-row">
           <div className="stat-card-pro">
             <div className="stat-icon-wrap blue"><Truck size={24} /></div>
@@ -84,7 +82,6 @@ const Profile = () => {
           </div>
         </section>
 
-        {/* Fleet and Activity Split */}
         <div className="content-split">
           <section className="glass-panel fleet-overview">
             <div className="panel-header">
@@ -123,7 +120,6 @@ const Profile = () => {
           </section>
         </div>
 
-        {/* Main Data Table */}
         <section className="glass-panel history-table-section">
           <div className="panel-header">
             <h3>Order Assignment History</h3>
