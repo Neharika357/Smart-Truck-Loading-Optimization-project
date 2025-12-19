@@ -64,7 +64,7 @@ app.post('/create-shipment', async (req, res) => {
 
 // ROUTE B: Get All Shipments for a Specific User
 // This is used to display the "Active Shipments" list on the dashboard
-app.get('/shipments', async (req, res) => {
+app.post('/get-shipments', async (req, res) => {
     try {
         const { username } = req.body;
 
