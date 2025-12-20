@@ -20,7 +20,7 @@ const TruckDashboard = () => {
     type: 'Box Truck'
   });
 
-  const username = "#T01"
+  const username = "TruckDealer1"
 
   useEffect(() => {
     const fetchTrucks = async () => {

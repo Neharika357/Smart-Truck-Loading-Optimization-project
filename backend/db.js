@@ -30,7 +30,7 @@ app.post('/create-truck', async (req, res) => {
             return res.status(404).json({ error: "Warehouse User not found. Please login first." });
         }
 
-        const randomID = "#T" + Math.floor(1000 + Math.random() * 9000);
+        const randomID = "T" + Math.floor(1000 + Math.random() * 9000);
 
         const newTruck = new TrucksInfo({
             truckId: randomID,
@@ -94,7 +94,7 @@ app.post('/create-shipment', async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: "Warehouse User not found. Please login first." });
         }
-        const randomID = "#S" + Math.floor(1000 + Math.random() * 9000);
+        const randomID = "S" + Math.floor(1000 + Math.random() * 9000);
 
         const newShipment = new ShipmentInfo({
             sid: randomID,
@@ -148,10 +148,17 @@ app.post('/request-truck', async (req, res) => {
 
         console.log(`Processing Booking: Shipment ${sid} -> Truck ${tid}`);
 
+        const shipmentDoc = await ShipmentInfo.findOne({ sid: sid });
+        const truckDoc = await TrucksInfo.findOne({ truckId: tid });
+
+        if (!shipmentDoc || !truckDoc) {
+            return res.status(404).json({ error: "Shipment or Truck not found" });
+        }
         
         const newShipmentOrder = new ShipmentOrder({
             sid: sid,
             tid: tid,
+            warehouse: shipmentDoc.warehouseUser,
             status: "Requested"
         });
         await newShipmentOrder.save();
@@ -159,6 +166,7 @@ app.post('/request-truck', async (req, res) => {
         const newTruckOrder = new TruckOrder({
             sid: sid,
             tid: tid,
+            dealer: truckDoc.dealerId,
             status: "Requested"
         });
         await newTruckOrder.save();
@@ -183,6 +191,9 @@ app.post('/accept-order', async (req, res) => {
 
         console.log(`Accepting Order: Shipment ${sid} <-> Truck ${tid}`);
 
+        const shipmentDoc = await ShipmentInfo.findOne({ sid });
+        const truckDoc = await TrucksInfo.findOne({ truckId: tid });
+
         await ShipmentInfo.findOneAndUpdate(
             { sid: sid },
             { status: "Assigned" } 
@@ -206,6 +217,8 @@ app.post('/accept-order', async (req, res) => {
         const newAcceptedOrder = new AcceptedOrder({
             sid: sid,
             tid: tid,
+            warehouse: shipmentDoc.warehouseUser,
+            dealer: truckDoc.dealerId,
             status: "Assigned" 
         });
         await newAcceptedOrder.save();
@@ -213,6 +226,7 @@ app.post('/accept-order', async (req, res) => {
         const finalShipmentLog = new ShipmentOrder({
             sid: sid,
             tid: tid,
+            warehouse: shipmentDoc.warehouseUser,
             status: "Assigned"
         });
         await finalShipmentLog.save();
@@ -290,63 +304,47 @@ app.post('/update-truck-status', async (req, res) => {
     }
 });
 
-app.get('/order-shipping/:sid', async (req, res) => {
+app.get('/dealer-requests/:username', async (req, res) => {
     try {
-        const { sid } = req.params;
-        const shipment = await ShipmentOrder.findOne({ sid: sid });
+        const user = await TruckDealer.findOne({ username: req.params.username });
+        if (!user) return res.status(404).json({ error: "Dealer not found" });
 
-        if (!shipment) {
-            return res.status(404).json({ error: "Shipment record not found" });
-        }
-
-        res.status(200).json(shipment);
+        const orders = await TruckOrder.find({ dealer: user._id }).sort({ createdAt: -1 });
+        res.status(200).json(orders);
     } catch (err) {
-        res.status(500).json({ error: "Error fetching shipment data" });
+        res.status(500).json({ error: "Error fetching dealer orders" });
     }
 });
 
-app.get('/order-trucks/:tid', async (req, res) => {
+app.get('/warehouse-orders/:username', async (req, res) => {
     try {
-        const { tid } = req.params;
-        const truckOrder = await TruckOrder.findOne({ tid: tid });
+        const user = await WarehouseUser.findOne({ username: req.params.username });
+        if (!user) return res.status(404).json({ error: "Warehouse user not found" });
 
-        if (!truckOrder) {
-            return res.status(404).json({ error: "Truck assignment record not found" });
-        }
-
-        res.status(200).json(truckOrder);
+        const orders = await ShipmentOrder.find({ warehouse: user._id }).sort({ createdAt: -1 });
+        res.status(200).json(orders);
     } catch (err) {
-        res.status(500).json({ error: "Error fetching truck order data" });
+        res.status(500).json({ error: "Error fetching warehouse orders" });
     }
 });
 
-app.get('/accepted-order/shipment/:sid', async (req, res) => {
+app.get('/accepted-orders/:role/:username', async (req, res) => {
     try {
-        const { sid } = req.params;
-        const acceptedOrder = await AcceptedOrder.findOne({ sid: sid });
+        const { role, username } = req.params;
+        let query = {};
 
-        if (!acceptedOrder) {
-            return res.status(404).json({ error: "No accepted order found for this shipment" });
+        if (role === 'dealer') {
+            const user = await TruckDealer.findOne({ username });
+            query = { dealer: user._id };
+        } else {
+            const user = await WarehouseUser.findOne({ username });
+            query = { warehouse: user._id };
         }
 
-        res.status(200).json(acceptedOrder);
+        const orders = await AcceptedOrder.find(query).sort({ createdAt: -1 });
+        res.status(200).json(orders);
     } catch (err) {
-        res.status(500).json({ error: "Error fetching accepted order by SID" });
-    }
-});
-
-app.get('/accepted-order/truck/:tid', async (req, res) => {
-    try {
-        const { tid } = req.params;
-        const acceptedOrder = await AcceptedOrder.findOne({ tid: tid });
-
-        if (!acceptedOrder) {
-            return res.status(404).json({ error: "No accepted order found for this truck" });
-        }
-
-        res.status(200).json(acceptedOrder);
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching accepted order by TID" });
+        res.status(500).json({ error: "Error fetching accepted orders" });
     }
 });
 

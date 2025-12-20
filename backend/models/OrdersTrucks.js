@@ -5,6 +5,9 @@ var Schema = mongoose.Schema;
 var orderTruckSchema = new Schema({
     tid:{type:String, required: true},
     sid:{type: String, required:true},
+    dealer:{type: mongoose.Schema.Types.ObjectId,
+        ref: 'TruckDealer',
+        required: true },
     status :{type: String, required:true},
 }, {timestamps: true});
 

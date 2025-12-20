@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import {Truck, LogOut, Bell, User, BarChart3, Leaf, CheckCircle, AlertCircle } from 'lucide-react'
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
@@ -6,32 +7,67 @@ import '../styles/navbar-trucks.css'
 
 const Navbar = ()=> {
     const navigate = useNavigate();
-    const [verifyingShipment, setVerifyingShipment] = useState(null);
+    const [verifyingShipment, setVerifyingShipment] = useState(null); 
+    const [shipmentDetails, setShipmentDetails] = useState(null);
+    const [truckDetails, setTruckDetails] = useState(null);
     const [feedbackMsg, setFeedbackMsg] = useState("");
     const [showNotifs, setShowNotifs] = useState(false);
+    const [notifications, setNotifications] = useState([]);
     const notifRef = useRef(null);
 
-    const [notifications, setNotifications] = useState([
-        { id: 1, shipment: 'S104', truck: 'T101', weight: 800, vol: 10, dest: 'Chennai', deadline: '20-Dec', boxes: 45 },
-        { id: 2, shipment: 'S105', truck: 'T103', weight: 1200, vol: 15, dest: 'Bangalore', deadline: '21-Dec', boxes: 60 },
-        { id: 3, shipment: 'S106', truck: 'T101', weight: 500, vol: 5, dest: 'Mumbai', deadline: '22-Dec', boxes: 20 },
-        { id: 4, shipment: 'S107', truck: 'T102', weight: 900, vol: 12, dest: 'Delhi', deadline: '23-Dec', boxes: 50 },
-        { id: 5, shipment: 'S104', truck: 'T101', weight: 800, vol: 10, dest: 'Chennai', deadline: '20-Dec', boxes: 45 },
-        { id: 6, shipment: 'S104', truck: 'T101', weight: 800, vol: 10, dest: 'Chennai', deadline: '20-Dec', boxes: 45 },
-        { id: 7, shipment: 'S104', truck: 'T101', weight: 800, vol: 10, dest: 'Chennai', deadline: '20-Dec', boxes: 45 },
-        { id: 8, shipment: 'S104', truck: 'T101', weight: 800, vol: 10, dest: 'Chennai', deadline: '20-Dec', boxes: 45 },
-        { id: 9, shipment: 'S104', truck: 'T101', weight: 800, vol: 10, dest: 'Chennai', deadline: '20-Dec', boxes: 45 },
-    ]);
+    const activeDealer = "TruckDealer1"; 
 
-    const handleAction = (id, type) => {
-        if (type === 'accept') setFeedbackMsg("Thank you for accepting!");
-        else setFeedbackMsg("Will inform the shipment owner to find another truck.");
+    const fetchNotifs = async () => {
+        try {
+            const res = await axios.get(`http://localhost:5000/dealer-requests/${activeDealer}`);
+            if (res.data) {
+                setNotifications(res.data);
+            }
+        } catch (err) {
+            console.log("Error fetching dealer notifications");
+        }
+    };
+
+    useEffect(() => {
+        fetchNotifs(); 
+        const interval = setInterval(fetchNotifs, 60000);
+        return () => clearInterval(interval);
+    }, [activeDealer]);
+
+    const handleVerifyClick = async (notif) => {
+        try {
+            const [shipmentRes, truckRes] = await Promise.all([
+                axios.get(`http://localhost:5000/shipment-details/${notif.sid}`),
+                axios.get(`http://localhost:5000/truck-details/${notif.tid}`)
+            ]);
+            
+            setShipmentDetails(shipmentRes.data);
+            setTruckDetails(truckRes.data);
+            setVerifyingShipment(notif);
+        } catch (err) {
+            alert("Error fetching verification details");
+        }
+    };
+
+    const handleAction = async (id, type, sid, tid) => {
+        const endpoint = type === 'accept' ? '/accept-order' : '/decline-request';
         
-        setTimeout(() => {
-        setNotifications(notifications.filter(n => n.id !== id));
-        setVerifyingShipment(null);
-        setFeedbackMsg("");
-        }, 2000);
+        try {
+            await axios.post(`http://localhost:5000${endpoint}`, { sid, tid });
+
+            if (type === 'accept') setFeedbackMsg("Thank you for accepting!");
+            else setFeedbackMsg("Will inform the shipment owner to find another truck.");
+            
+            setTimeout(() => {
+                setNotifications([]); 
+                setVerifyingShipment(null);
+                setShipmentDetails(null);
+                setTruckDetails(null);
+                setFeedbackMsg("");
+            }, 2000);
+        } catch (err) {
+            alert("Action failed. Please try again.");
+        }
     };
 
     useEffect(() => {
@@ -70,12 +106,32 @@ const Navbar = ()=> {
                                 <h4>Notifications</h4>
                             </div>
                             <div className="notif-scroll-area">
-                                {notifications.map((n) => (
-                                <div key={n.id} className="notif-item">
-                                    <p>Shipment <strong>{n.shipment}</strong> requested truck <strong>{n.truck}</strong></p>
-                                    <button className="verify-btn" onClick={() => setVerifyingShipment(n)}>Verify</button>
-                                </div>
-                                ))}
+                                {notifications.length === 0 ? (
+                                    <div className="notif-empty">No active records</div>
+                                ) : (
+                                    notifications.map((n) => (
+                                        <div key={n._id} className={`notif-item ${n.status.toLowerCase()}`}>
+                                            <div className="notif-content">
+                                                {n.status === "Requested" ? (
+                                                    <>
+                                                        <p>Truck <strong>{n.tid}</strong> was requested by Shipment <strong>{n.sid}</strong></p>
+                                                        <button className="verify-btn" onClick={() => handleVerifyClick(n)}>
+                                                            Verify
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <p>Truck <strong>{n.tid}</strong> is currently <strong>{n.status}</strong></p>
+                                                        <small>Shipment: {n.sid}</small>
+                                                        <div className={`status-pill ${n.status.toLowerCase()}`}>
+                                                            {n.status}
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                             </div>
                         )}
@@ -86,40 +142,55 @@ const Navbar = ()=> {
                 </div>
                 </div>
             </nav>
-            {verifyingShipment && (
-                <div className="modal-overlay blur-bg intense">
+           {verifyingShipment && shipmentDetails && truckDetails && (
+            <div className="modal-overlay blur-bg intense">
                 <div className="verification-box glass-card">
                     {feedbackMsg ? (
-                    <div className="feedback-view">
-                        {feedbackMsg.includes("Thank") ? <CheckCircle color="#2d6a4f" size={48} /> : <AlertCircle color="#e53e3e" size={48} />}
-                        <p>{feedbackMsg}</p>
-                    </div>
+                        <div className="feedback-view">
+                            {feedbackMsg.includes("Thank") ? 
+                                <CheckCircle color="#2d6a4f" size={48} /> : 
+                                <AlertCircle color="#e53e3e" size={48} />
+                            }
+                            <p>{feedbackMsg}</p>
+                        </div>
                     ) : (
-                    <>
-                        <h3>Verify Shipment {verifyingShipment.shipment}</h3>
-                        <div className="details-grid">
-                        <div className="detail-col">
-                            <h4>Shipment Details</h4>
-                            <p>Weight: {verifyingShipment.weight}kg</p>
-                            <p>Volume: {verifyingShipment.vol}m³</p>
-                            <p>Destination: {verifyingShipment.dest}</p>
-                            <p>Boxes: {verifyingShipment.boxes}</p>
-                            <p>Deadline: {verifyingShipment.deadline}</p>
-                        </div>
-                        <div className="detail-col">
-                            <h4>Truck {verifyingShipment.truck} Details</h4>
-                            <p>Capacity: 3000kg</p>
-                            <p>Route: Hyderabad → {verifyingShipment.dest}</p>
-                        </div>
-                        </div>
-                        <div className="verify-actions">
-                        <button className="btn-decline" onClick={() => handleAction(verifyingShipment.id, 'reject')}>Decline</button>
-                        <button className="btn-confirm" onClick={() => handleAction(verifyingShipment.id, 'accept')}>Accept</button>
-                        </div>
-                    </>
+                        <>
+                            <h3>Verify Shipment {shipmentDetails.sid}</h3>
+                            <div className="details-grid">
+                                <div className="detail-col">
+                                    <h4>Shipment Details</h4>
+                                    <p>Weight: {shipmentDetails.weight}kg</p>
+                                    <p>Volume: {shipmentDetails.volume}m³</p>
+                                    <p>Origin: {shipmentDetails.origin}</p>
+                                    <p>Destination: {shipmentDetails.destination}</p>
+                                    <p>Deadline: {new Date(shipmentDetails.deadline).toLocaleDateString()}</p>
+                                </div>
+                                <div className="detail-col">
+                                    <h4>Truck {truckDetails.truckId} Details</h4>
+                                    <p>Capacity: {truckDetails.capacityWeight}kg</p>
+                                    <p>Type: {truckDetails.truckType}</p>
+                                    <p>Route: {truckDetails.route.from} → {truckDetails.route.to}</p>
+                                    <p>Rate: ₹{truckDetails.pricePerKm}/km</p>
+                                </div>
+                            </div>
+                            <div className="verify-actions">
+                                <button 
+                                    className="btn-decline" 
+                                    onClick={() => handleAction(verifyingShipment._id, 'reject', shipmentDetails.sid, truckDetails.truckId)}
+                                >
+                                    Decline
+                                </button>
+                                <button 
+                                    className="btn-confirm" 
+                                    onClick={() => handleAction(verifyingShipment._id, 'accept', shipmentDetails.sid, truckDetails.truckId)}
+                                >
+                                    Accept
+                                </button>
+                            </div>
+                        </>
                     )}
                 </div>
-                </div>
+             </div>
             )}
         </> 
     );
