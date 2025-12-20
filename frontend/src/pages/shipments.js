@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/navbar-shipment'; 
+import Navbar from '../components/navbar-shipment';
 import CreateShipment from '../components/createShipment';
 import ShipmentList from '../components/shipmentList';
 import TruckSelectionModal from '../components/truckSelectionModel';
@@ -9,10 +9,13 @@ import '../styles/shipments.css';
 const CURRENT_USER = "Warehouse1"; 
 
 const WarehouseDashboard = () => {
-  const [shipments, setShipments] = useState([]); 
+  const [shipments, setShipments] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [modalData, setModalData] = useState(null); 
   const [feedbackMsg, setFeedbackMsg] = useState(null);
+
+  // Filter State
+  const [filterStatus, setFilterStatus] = useState('All'); 
 
   useEffect(() => {
     fetchShipments();
@@ -25,17 +28,9 @@ const WarehouseDashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: CURRENT_USER }) 
       });
-      
       const data = await response.json();
-
       if (response.ok) {
-        const formattedData = data.map(item => ({
-          ...item,
-          id: item.sid, 
-        }));
-        setShipments(formattedData);
-      } else {
-        console.error("Error fetching shipments:", data.error);
+        setShipments(data.map(item => ({ ...item, id: item.sid })));
       }
     } catch (error) {
       console.error("Server error:", error);
@@ -43,29 +38,60 @@ const WarehouseDashboard = () => {
   };
 
   const handleAddShipment = async (formData) => {
+    // ... (Your existing Add Shipment Logic)
     try {
-      const response = await fetch('http://localhost:5000/create-shipment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          deadline: formData.date,
-          username: CURRENT_USER 
-        })
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        fetchShipments(); 
-        triggerFeedback("Shipment Created Successfully!");
-      } else {
-        alert("Error: " + result.error);
+        const response = await fetch('http://localhost:5000/create-shipment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            deadline: formData.date,
+            username: CURRENT_USER 
+          })
+        });
+  
+        if (response.ok) {
+          fetchShipments(); 
+          triggerFeedback("Shipment Created Successfully!");
+        } else {
+            alert("Error adding shipment");
+        }
+      } catch (error) {
+        console.error("Error adding shipment:", error);
       }
-    } catch (error) {
-      console.error("Error adding shipment:", error);
-      alert("Failed to connect to server.");
-    }
+  };
+
+  const handleBookTruck = async (truckId) => {
+    // ... (Your existing Book Truck Logic)
+     // 1. Prepare Data
+     const bookingData = { sid: modalData.id, tid: truckId };
+
+     try {
+       const response = await fetch('http://localhost:5000/request-truck', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(bookingData)
+       });
+ 
+       if (response.ok) {
+         triggerFeedback(`Booking Request Sent to ${truckId}!`);
+         setModalData(null); 
+         fetchShipments(); 
+ 
+         const newNotif = { 
+           title: 'Request Sent', 
+           msg: `Waiting for approval on ${truckId} for ${modalData.id}`, 
+           type: 'pending',
+           time: 'Just now'
+         };
+         setNotifications([newNotif, ...notifications]);
+ 
+       } else {
+         alert("Failed to send booking request.");
+       }
+     } catch (error) {
+       console.error("Booking Error:", error);
+     }
   };
 
   const triggerFeedback = (msg) => {
@@ -77,24 +103,11 @@ const WarehouseDashboard = () => {
     setModalData(shipment); 
   };
 
-  const handleBookTruck = (truckId) => {
-    triggerFeedback(`Booking Request Sent to ${truckId}!`);
-    setModalData(null); 
-    const updatedShipments = shipments.map(s => {
-      if (s.id === modalData.id) {
-        return { ...s, status: 'Requested', requestedTruck: truckId };
-      }
-      return s;
-    });
-    setShipments(updatedShipments);
-    const newNotif = { 
-      title: 'Request Sent', 
-      msg: `Waiting for approval on ${truckId} for ${modalData.id}`, 
-      type: 'pending',
-      time: 'Just now'
-    };
-    setNotifications([newNotif, ...notifications]);
-  };
+  // Filter Logic
+  const filteredShipments = shipments.filter(shipment => {
+    if (filterStatus === 'All') return true;
+    return shipment.status === filterStatus;
+  });
 
   return (
     <div className="dashboard-container">
@@ -106,7 +119,15 @@ const WarehouseDashboard = () => {
         </div>
 
         <div style={styles.rightPanel}>
-          <ShipmentList shipments={shipments} onFindTruck={handleFindTruck} />
+          
+          {/* WE MOVED THE BUTTONS INSIDE THIS COMPONENT */}
+          <ShipmentList 
+            shipments={filteredShipments} 
+            onFindTruck={handleFindTruck} 
+            filterStatus={filterStatus}      // Passing state down
+            setFilterStatus={setFilterStatus} // Passing "set" function down
+          />
+        
         </div>
       </div>
 
@@ -120,7 +141,8 @@ const WarehouseDashboard = () => {
 
       {feedbackMsg && (
         <div className="modal-overlay blur-bg intense animate-fade-in">
-          <div className="verification-box glass-card feedback-popup">
+            {/* ... (Your existing popup logic) */}
+             <div className="verification-box glass-card feedback-popup">
             <div className="feedback-view">
               <div className="success-icon-animate">
                 <CheckCircle color="#2d6a4f" size={80} strokeWidth={1.5} />
@@ -137,28 +159,28 @@ const WarehouseDashboard = () => {
 };
 
 const styles = {
-  mainContent: {
-    minHeight: 'calc(100vh - 90px)',
-    justifyContent: 'top',
-    display: 'grid',
-    gridTemplateColumns: '350px 1fr',
-    gap: '2rem',
-    maxWidth: '1400px',
-    margin: '2rem auto',
-    padding: '0 2rem',
-  },
-  leftPanel: { 
-    flex: '0 0 380px', 
-    position: 'sticky', 
-    top: '30px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'top',
-    height: 'calc(100vh - 120px)',
-  },
-  rightPanel: { 
-    flex: '1' 
-  }
-};
+    mainContent: {
+      minHeight: 'calc(100vh - 90px)',
+      justifyContent: 'top',
+      display: 'grid',
+      gridTemplateColumns: '350px 1fr',
+      gap: '2rem',
+      maxWidth: '1400px',
+      margin: '2rem auto',
+      padding: '0 2rem',
+    },
+    leftPanel: { 
+      flex: '0 0 380px', 
+      position: 'sticky', 
+      top: '30px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'top',
+      height: 'calc(100vh - 120px)',
+    },
+    rightPanel: { 
+      flex: '1' 
+    }
+  };
 
 export default WarehouseDashboard;
