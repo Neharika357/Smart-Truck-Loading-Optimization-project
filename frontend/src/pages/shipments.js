@@ -18,6 +18,14 @@ const WarehouseDashboard = () => {
 
   useEffect(() => {
     fetchShipments();
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 30000); 
+    return () => clearInterval(interval);
   }, []);
 
   const fetchShipments = async () => {
@@ -36,23 +44,37 @@ const WarehouseDashboard = () => {
     }
   };
 
-  // --- START OF NEW CODE ---
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/warehouse-orders/${CURRENT_USER}`);
+      const data = await response.json();
+      if (response.ok) {
+        const formattedNotifs = data.map(order => ({
+          id: order._id,
+          sid: order.sid,
+          tid: order.tid,
+          status: order.status, // Requested, Assigned, In Transit, etc.
+          time: new Date(order.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }));
+        setNotifications(formattedNotifs);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
 
-  // 1. Create a Ref to store the latest shipments list without triggering re-renders
   const shipmentsRef = useRef([]);
 
-  // 2. Sync the Ref whenever the shipments state updates
   useEffect(() => {
     shipmentsRef.current = shipments;
   }, [shipments]);
 
-  // 3. Set up the Polling Interval (Checks every 5 seconds)
   useEffect(() => {
     const interval = setInterval(() => {
       checkForUpdates();
-    }, 5000); // 5000ms = 5 seconds
+    }, 5000); 
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval); 
   }, []);
 
   const checkForUpdates = async () => {

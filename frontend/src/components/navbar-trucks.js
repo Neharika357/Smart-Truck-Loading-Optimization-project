@@ -110,23 +110,28 @@ const Navbar = ()=> {
                                     <div className="notif-empty">No active records</div>
                                 ) : (
                                     notifications.map((n) => (
-                                        <div key={n._id} className={`notif-item ${n.status.toLowerCase()}`}>
-                                            <div className="notif-content">
-                                                {n.status === "Requested" ? (
-                                                    <>
+                                        <div key={n._id} className="notif-item">
+                                            <div className={`status-badge-corner ${n.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                                                {n.status}
+                                            </div>
+                                            <div className="notif-body">
+                                                <div className="notif-text">
+                                                    {n.status === "Requested" ? (
                                                         <p>Truck <strong>{n.tid}</strong> was requested by Shipment <strong>{n.sid}</strong></p>
+                                                    ) : (
+                                                        <>
+                                                            <p>Shipment <strong>{n.sid}</strong> status updated for Truck <strong>{n.tid}</strong></p>
+                                                            <span className="shipment-subtext">Last update: {n.time || 'Just now'}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                {n.status === "Requested" && (
+                                                    <div className="notif-actions">
                                                         <button className="verify-btn" onClick={() => handleVerifyClick(n)}>
                                                             Verify
                                                         </button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <p>Truck <strong>{n.tid}</strong> is currently <strong>{n.status}</strong></p>
-                                                        <small>Shipment: {n.sid}</small>
-                                                        <div className={`status-pill ${n.status.toLowerCase()}`}>
-                                                            {n.status}
-                                                        </div>
-                                                    </>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>

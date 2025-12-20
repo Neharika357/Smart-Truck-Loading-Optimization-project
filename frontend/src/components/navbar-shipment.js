@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Truck, LogOut, Bell, User, CheckCircle, Clock } from 'lucide-react';
+import { Truck, LogOut, Bell, User } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import '../styles/navbar-trucks.css'; 
+import '../styles/navbar-shipments.css'; 
 
 const Navbar = ({ notifications = [] }) => {
     const navigate = useNavigate();
@@ -44,17 +44,16 @@ const Navbar = ({ notifications = [] }) => {
                                         {notifications.length === 0 ? (
                                             <div className="notif-item"><p>No new notifications</p></div>
                                         ) : (
-                                            notifications.map((notif, index) => (
-                                                <div key={index} className="notif-item" style={{display:'flex', gap:'10px', alignItems:'start'}}>
-                                                    <div style={{marginTop:'2px'}}>
-                                                        {notif.type === 'accepted' ? 
-                                                            <CheckCircle size={16} color="#10b981"/> : 
-                                                            <Clock size={16} color="#f59e0b"/>
-                                                        }
+                                            notifications.map((n) => (
+                                                <div key={n.id} className="notif-item">
+                                                    {/* Absolute badge pinned to corner */}
+                                                    <div className={`status-badge-corner ${n.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                                                        {n.status}
                                                     </div>
-                                                    <div>
-                                                        <p style={{margin:0, fontWeight:'bold', color:'#2d3748'}}>{notif.title}</p>
-                                                        <p style={{margin:'2px 0 0 0', fontSize:'0.75rem', color:'#718096'}}>{notif.msg}</p>
+
+                                                    <div className="notif-content">
+                                                        <p>Shipment <strong>{n.sid}</strong> status updated for Truck <strong>{n.tid}</strong></p>
+                                                        <span className="shipment-subtext">Last update: {n.time}</span>
                                                     </div>
                                                 </div>
                                             ))
@@ -73,5 +72,6 @@ const Navbar = ({ notifications = [] }) => {
         </nav>
     );
 };
+
 
 export default Navbar;

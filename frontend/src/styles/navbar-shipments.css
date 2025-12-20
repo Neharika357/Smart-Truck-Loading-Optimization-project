@@ -197,11 +197,6 @@
   border-radius: 10px;
 }
 
-.notif-item {
-  padding: 15px 0;
-  border-bottom: 1px solid #f8faf9;
-}
-
 .notif-item:last-child {
   border-bottom: none;
 }
@@ -215,14 +210,6 @@
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-.notif-item {
-    border-left: 4px solid #cbd5e0;
-    padding: 12px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    position: relative
 }
 
 /* Status specific colors */
@@ -240,6 +227,28 @@
     margin-bottom: 12px;
 }
 
+/* THE CORNER BADGE */
+.status-badge-corner {
+    position: absolute;
+    top: 10px;
+    right: -5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.notif-text{
+    width: 200px;
+}
+
+.status-badge-corner.requested { background: #ebf8ff; color: #2b6cb0; }
+.status-badge-corner.assigned, 
+.status-badge-corner.accepted { background: #f0fff4; color: #2f855a; }
+.status-badge-corner.in-transit { background: #fffaf0; color: #9c4221; }
+.status-badge-corner.delivered { background: #faf5ff; color: #553c9a; }
+
 .notif-content {
     padding-right: 70px; /* Space to prevent text overlap with badge */
 }
@@ -249,73 +258,4 @@
     color: #718096;
     margin-top: 5px;
     display: block;
-}
-
-.notif-item {
-    position: relative; 
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 4px solid #4a5568;
-    border-radius: 12px;
-    padding: 20px 16px 16px 16px; 
-    margin-bottom: 12px;
-    transition: all 0.2s ease;
-}
-
-.status-badge-corner {
-    position: absolute;
-    top: 10px;
-    right: -10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Status Colors */
-.status-badge-corner.requested { background: #ebf8ff; color: #2b6cb0; }
-.status-badge-corner.assigned, 
-.status-badge-corner.accepted { background: #f0fff4; color: #2f855a; }
-.status-badge-corner.pending { background: #fffaf0; color: #9c4221; }
-
-.notif-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-}
-
-.notif-text {
-    flex: 1; /* Takes up remaining space */
-}
-
-.notif-text p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #e2e8f0;
-    line-height: 1.4;
-}
-
-.verify-btn {
-    background: #2d6a4f;
-    color: white;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap; 
-}
-
-.verify-btn:hover {
-    background: #40916c;
-}
-
-.shipment-subtext {
-    font-size: 0.75rem;
-    color: #718096;
-    display: block;
-    margin-top: 4px;
 }
