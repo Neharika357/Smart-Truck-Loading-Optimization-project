@@ -7,6 +7,9 @@ import '../styles/trucks.css';
 const TruckDashboard = () => {
   const [trucks, setTrucks] = useState([]); 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('All'); 
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [selectedTruck, setSelectedTruck] = useState(null);
   
   const [formData, setFormData] = useState({
     weight: '',
@@ -47,6 +50,15 @@ const TruckDashboard = () => {
     } catch (err) {
       alert("Error: " + err);
     }
+  };
+
+  const filteredTrucks = trucks.filter(truck => 
+    statusFilter === 'All' ? true : truck.status === statusFilter
+  );
+
+  const handleStatusUpdate = (truck) => {
+    setSelectedTruck(truck);
+    setIsStatusDialogOpen(true);
   };
 
   return (
@@ -121,31 +133,75 @@ const TruckDashboard = () => {
                 <input type="text" placeholder="Search ID or Route..." />
               </div>
             </div>
-            <div className="truck-grid">
-              {trucks.map((truck) => (
-                <div key={truck._id} className="truck-wrapper">
-                    <div  className={`truck-card-mini `} >
-                    <div className="truck-card-top">
-                        <span className="truck-tag">{truck.truckId}</span>
-                        <span className={`status-pill ${truck.status.toLowerCase().replace(' ', '-')}`}>
-                        {truck.status}
-                        </span>
-                    </div>
-                    <div className="truck-card-details">
-                        <p><strong>{truck.route.from} → {truck.route.to}</strong></p>
-                        <div className="specs">
-                        <span>{truck.capacityWeight}kg</span>
-                        <span>{truck.capacityVolume}m^3</span>
-                        <span>₹{truck.pricePerKm}/km</span>
-                        </div>
-                    </div>
-                    </div>    
-                </div>   
+            <div className="filter-tabs">
+              {['All', 'Available', 'In Use'].map(tab => (
+                <button 
+                  key={tab}
+                  className={`filter-btn ${statusFilter === tab ? 'active' : ''}`}
+                  onClick={() => setStatusFilter(tab)}
+                >
+                  {tab}
+                </button>
               ))}
+            </div>
+           <div className="truck-grid">
+            {filteredTrucks.map((truck) => (
+              <div key={truck._id} className="truck-wrapper">
+                <div className={`truck-card-mini ${truck.status === 'In Use' ? 'in-use-layout' : ''}`}>
+                  <div className="truck-card-top">
+                    <span className="truck-tag">{truck.truckId}</span>
+                    <span className={`status-pill ${truck.status.toLowerCase().replace(' ', '-')}`}>
+                      {truck.status}
+                    </span>
+                  </div>
+                  
+                  <div className="truck-card-content-wrapper">
+                    <div className="truck-card-details">
+                      <p><strong>{truck.route.from} → {truck.route.to}</strong></p>
+                      <div className="specs">
+                        <span>{truck.capacityWeight}kg</span>
+                        <span>{truck.capacityVolume}m³</span>
+                        <span>₹{truck.pricePerKm}/km</span>
+                      </div>
+                    </div>
+
+                    {truck.status === 'In Use' ? 
+                      <button className="update-status-btn" onClick={() => handleStatusUpdate(truck)}>
+                        Update Status
+                      </button>
+                    :<></>}
+                  </div>
+                </div>
+              </div>
+             ))}
             </div>
           </div>
         </section>
       </main>
+      {isStatusDialogOpen && (
+        <div className="modal-overlay blur-bg">
+          <div className="glass-card status-dialog">
+            <h3>Update Delivery Status</h3>
+            <p>Current: <strong>{selectedTruck?.status}</strong></p>
+            
+            <div className="status-options">
+              {['Assigned', 'Picked', 'In Transit', 'Delivered'].map(s => (
+                <button 
+                  key={s} 
+                  className="status-opt-btn"
+                  onClick={() => {
+                    /* Add axios.put call here to update backend */
+                    setIsStatusDialogOpen(false);
+                  }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <button className="close-btn" onClick={() => setIsStatusDialogOpen(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
       {showSuccess && (
         <div className="modal-overlay blur-bg intense animate-fade-in">
           <div className="verification-box glass-card feedback-popup">
