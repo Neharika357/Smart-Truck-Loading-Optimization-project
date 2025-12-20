@@ -1,7 +1,8 @@
 var express = require('express');
 var cors = require('cors');
 var mongoose = require('mongoose');
-var Order = require('./models/Orders.js')
+var ShipmentOrder = require('./models/OrdersShipment.js')
+var TruckOrder = require('./models/OrdersTrucks.js')
 var AcceptedOrder = require('./models/AcceptedOrders.js');
 var ShipmentInfo = require('./models/ShipmentInfo.js')
 var TruckInfo  = require('./models/TrucksInfo.js')
@@ -20,48 +21,37 @@ mongoose.connect(url)
   .then(() => console.log('✅ Connected to MongoDB (SmartTruckDB)'))
   .catch((err) => console.log('❌ DB Connection Error:', err));
 
-app.post('/accept-order', async (req, res) => {
+app.post('/request-truck', async (req, res) => {
     try {
         const { sid, tid } = req.body;
 
-        await Order.findOneAndUpdate({ sid: sid }, { status: "Accepted" });
+        console.log(`Processing Booking: Shipment ${sid} -> Truck ${tid}`);
 
-        const trackingEntry = new AcceptedOrder({
+        
+        const newShipmentOrder = new ShipmentOrder({
             sid: sid,
             tid: tid,
-            status: "Assigned" 
+            status: "Requested"
         });
-        await trackingEntry.save();
+        await newShipmentOrder.save();
+
+        const newTruckOrder = new TruckOrder({
+            sid: sid,
+            tid: tid,
+            status: "Requested"
+        });
+        await newTruckOrder.save();
 
         await ShipmentInfo.findOneAndUpdate(
             { sid: sid },
-            { status: "Assigned" }
+            { 
+                status: "Requested"
+            }
         );
-        await TruckInfo.findOneAndUpdate(
-            {truckId : tid},
-            {status: "In use"}
-        )
-        res.status(200).json({ message: "Order Accepted & Tracking Started" });
+        res.status(200).json({ message: "Booking Request Sent Successfully!" });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to accept order" });
-    }
-});
-
-app.post('/update-tracking', async (req, res) => {
-    try {
-        const { sid, newStatus } = req.body; // newStatus could be "Picked", "In Transit", "Delivered"
-
-        // 1. Update the Tracking Table
-        await AcceptedOrder.findOneAndUpdate({ sid: sid }, { status: newStatus });
-
-        // 2. Sync with Shipment Info (So Warehouse User sees it too)
-        await ShipmentInfo.findOneAndUpdate({ sid: sid }, { status: newStatus });
-
-        res.status(200).json({ message: "Tracking Updated" });
-
-    } catch (err) {
-        res.status(500).json({ error: "Failed to update status" });
+        console.error("Error in request-truck:", err);
+        res.status(500).json({ error: "Failed to process booking request" });
     }
 });
