@@ -14,7 +14,6 @@ const WarehouseDashboard = () => {
   const [modalData, setModalData] = useState(null); 
   const [feedbackMsg, setFeedbackMsg] = useState(null);
 
-  // Filter State
   const [filterStatus, setFilterStatus] = useState('All'); 
 
   useEffect(() => {
@@ -38,7 +37,6 @@ const WarehouseDashboard = () => {
   };
 
   const handleAddShipment = async (formData) => {
-    // ... (Your existing Add Shipment Logic)
     try {
         const response = await fetch('http://localhost:5000/create-shipment', {
           method: 'POST',
@@ -62,8 +60,6 @@ const WarehouseDashboard = () => {
   };
 
   const handleBookTruck = async (truckId) => {
-    // ... (Your existing Book Truck Logic)
-     // 1. Prepare Data
      const bookingData = { sid: modalData.id, tid: truckId };
 
      try {
@@ -103,7 +99,6 @@ const WarehouseDashboard = () => {
     setModalData(shipment); 
   };
 
-  // Filter Logic
   const filteredShipments = shipments.filter(shipment => {
     if (filterStatus === 'All') return true;
     return shipment.status === filterStatus;
@@ -119,13 +114,12 @@ const WarehouseDashboard = () => {
         </div>
 
         <div style={styles.rightPanel}>
-          
-          {/* WE MOVED THE BUTTONS INSIDE THIS COMPONENT */}
+         
           <ShipmentList 
             shipments={filteredShipments} 
             onFindTruck={handleFindTruck} 
-            filterStatus={filterStatus}      // Passing state down
-            setFilterStatus={setFilterStatus} // Passing "set" function down
+            filterStatus={filterStatus}     
+            setFilterStatus={setFilterStatus} 
           />
         
         </div>
@@ -141,7 +135,6 @@ const WarehouseDashboard = () => {
 
       {feedbackMsg && (
         <div className="modal-overlay blur-bg intense animate-fade-in">
-            {/* ... (Your existing popup logic) */}
              <div className="verification-box glass-card feedback-popup">
             <div className="feedback-view">
               <div className="success-icon-animate">

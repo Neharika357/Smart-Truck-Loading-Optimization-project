@@ -4,7 +4,7 @@ import { FaLeaf, FaRupeeSign, FaRoute, FaTruck } from 'react-icons/fa';
 const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
   const suggestedTrucks = [
     { 
-      id: 'T-105', dealer: 'Speed Logistics', match: 98, cost: 12000, 
+      id: '#T3003', dealer: '#T01', match: 98, cost: 12000, 
       co2: 'Low', rating: 4.8, capacity: '3000kg' 
     },
     { 

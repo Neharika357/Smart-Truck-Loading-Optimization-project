@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaTruck, FaHourglassHalf, FaWeightHanging, FaBox } from 'react-icons/fa';
 import { Search } from 'lucide-react';
-import '../styles/shipments.css'; // Ensure this is imported
+import '../styles/shipments.css'; 
 
 const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus }) => {
   return (
@@ -21,7 +21,6 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
         </div>
       </div>
 
-      {/* --- NEW: FILTER BUTTONS (Inserted Here) --- */}
       <div className="filter-tabs-row">
         {['All', 'Pending', 'Requested', 'Assigned'].map(status => (
             <button 
@@ -34,7 +33,6 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
         ))}
       </div>
 
-      {/* LIST */}
       <div style={{ overflowY: 'auto', flex: 1, paddingBottom: '20px' }}>
         {shipments.length === 0 ? (
            <div style={{ padding: '40px', textAlign: 'center', color: '#9ca3af' }}>
@@ -68,27 +66,22 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
                 </div>
               </div>
 
-              {/* RIGHT SIDE ACTIONS */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
                 
-                {/* Pending: Show Button */}
                 {s.status === 'Pending' && (
                   <button className="btn-primary" onClick={() => onFindTruck(s)}>
                     Find Best Truck
                   </button>
                 )}
-
-                {/* Requested: Show Text */}
                 {s.status === 'Requested' && (
                    <span style={{ fontSize: '12px', color: '#7e22ce', fontWeight: '600', display:'flex', alignItems:'center', gap:'5px' }}>
-                      <FaHourglassHalf /> Waiting: {s.assignedTruck || s.requestedTruck}
+                      <FaHourglassHalf /> Waiting
                    </span>
                 )}
 
-                {/* Assigned: Show Confirmed */}
                 {s.status === 'Assigned' && (
                    <span style={{ fontSize: '12px', color: '#15803d', fontWeight: '600', display:'flex', alignItems:'center', gap:'5px' }}>
-                      <FaTruck /> Confirmed: {s.assignedTruck || s.requestedTruck}
+                      <FaTruck /> Confirmed
                    </span>
                 )}
               </div>
@@ -107,7 +100,6 @@ const StatusBadge = ({ status }) => {
     Requested: { color: '#7e22ce', bg: '#f3e8ff', icon: <FaHourglassHalf size={10} /> }, 
     Assigned: { color: '#15803d', bg: '#dcfce7', icon: <FaTruck size={10} /> }, 
   };
-  // Fallback to Pending if status doesn't match
   const s = styles[status] || styles.Pending;
 
   return (
