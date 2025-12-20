@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import Navbar from '../components/navbar-shipment';
 import CreateShipment from '../components/createShipment';
 import ShipmentList from '../components/shipmentList';
@@ -36,6 +36,65 @@ const WarehouseDashboard = () => {
     }
   };
 
+  // --- START OF NEW CODE ---
+
+  // 1. Create a Ref to store the latest shipments list without triggering re-renders
+  const shipmentsRef = useRef([]);
+
+  // 2. Sync the Ref whenever the shipments state updates
+  useEffect(() => {
+    shipmentsRef.current = shipments;
+  }, [shipments]);
+
+  // 3. Set up the Polling Interval (Checks every 5 seconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkForUpdates();
+    }, 5000); // 5000ms = 5 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
+  const checkForUpdates = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-shipments', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: CURRENT_USER }) 
+      });
+      const newData = await response.json();
+
+      if (response.ok) {
+        // Check for status changes
+        newData.forEach(newItem => {
+          // Find the same shipment in our previous data
+          const oldItem = shipmentsRef.current.find(old => old.sid === newItem.sid);
+
+          // IF it existed before AND status changed from 'Requested' to 'Assigned'
+          if (oldItem && oldItem.status === 'Requested' && newItem.status === 'Assigned') {
+            
+            // Add to Notifications
+            const newNotif = { 
+              title: 'Request Accepted!', 
+              msg: `Truck Dealer has accepted shipment ${newItem.sid}`, 
+              type: 'success', // Green color
+              time: 'Just now'
+            };
+            
+            setNotifications(prev => [newNotif, ...prev]);
+            triggerFeedback(`Shipment ${newItem.sid} is now Assigned!`);
+          }
+        });
+
+        // Update the dashboard with new data
+        setShipments(newData.map(item => ({ ...item, id: item.sid })));
+      }
+    } catch (error) {
+      console.error("Polling error:", error);
+    }
+  };
+
+  // --- END OF NEW CODE ---
   const handleAddShipment = async (formData) => {
     try {
         const response = await fetch('http://localhost:5000/create-shipment', {
