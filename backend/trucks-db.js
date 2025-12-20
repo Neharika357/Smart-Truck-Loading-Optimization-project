@@ -10,7 +10,8 @@ app.use(cors({
   credentials: true                 
 }));
 app.use(express.json());
-var url = "mongodb+srv://clpro_123:Pramodha123@cluster0.k9kjmxq.mongodb.net/";
+
+var url = "mongodb+srv://clpro_123:Pramodha123@cluster0.k9kjmxq.mongodb.net/SmartTruckDB?retryWrites=true&w=majority";
 mongoose.connect(url)
 .then((res)=> console.log('Connected to db'))
 .catch((err) => console.log(err));
@@ -69,6 +70,7 @@ app.get('/truck', async (req, res) => {
         res.status(500).json({ error: "Could not fetch trucks" });
     }
 });
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
