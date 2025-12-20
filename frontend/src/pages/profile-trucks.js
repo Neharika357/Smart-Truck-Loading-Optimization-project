@@ -1,45 +1,99 @@
-import React, { useState } from 'react';
-import { Truck, BarChart3, Mail, Package, ClipboardList, ChevronRight, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Truck, BarChart3, Mail, Package, ClipboardList, ChevronRight, ExternalLink, MapPin, X, Weight, Ruler, Calendar } from 'lucide-react';
 import '../styles/profile-trucks.css';
 import Navbar from '../components/navbar-trucks';
 
 const Profile = () => {
   const [showAllOrders, setShowAllOrders] = useState(false);
-
-  const [dealerInfo] = useState({
-    name: "TruckDealer123",
-    email: "dealer122@email.com",
-    location: "Hyderabad, India",
-    totalTrucks: 56,
-    available: 34,
-    totalOrders: 128
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  
+  // State for dynamic data
+  const [dealerInfo, setDealerInfo] = useState({
+    name: "Loading...",
+    email: "...",
+    location: "Fetching location...",
+    totalTrucks: 0,
+    available: 0,
+    totalOrders: 0
   });
 
-  const [fleet] = useState([
-    { type: "Freightliner Cascadia", count: 26, category: "Heavy Duty" },
-    { type: "Kenworth T680", count: 8, category: "Long Haul" },
-    { type: "Peterbilt 579", count: 6, category: "Medium Duty" },
-    { type: "Volvo VNL", count: 4, category: "Heavy Duty" }
-  ]);
+  const [fleetStats, setFleetStats] = useState([]);
+  const [orderHistory, setOrderHistory] = useState([]);
 
-  const [orderAssignments] = useState([
-    { id: "127", trucks: 5, warehouse: "Warehouse A", status: "Dispatched", date: "18 Dec 2025" },
-    { id: "126", trucks: 8, warehouse: "Warehouse B", status: "In Transit", date: "17 Dec 2025" },
-    { id: "125", trucks: 12, warehouse: "Warehouse C", status: "Delivered", date: "15 Dec 2025" },
-    { id: "124", trucks: 7, warehouse: "Warehouse D", status: "Dispatched", date: "14 Dec 2025" },
-    { id: "123", trucks: 4, warehouse: "Warehouse A", status: "Delivered", date: "12 Dec 2025" },
-    { id: "122", trucks: 6, warehouse: "Warehouse E", status: "In Transit", date: "10 Dec 2025" },
-    { id: "122", trucks: 6, warehouse: "Warehouse E", status: "In Transit", date: "10 Dec 2025" },
-    { id: "122", trucks: 6, warehouse: "Warehouse E", status: "In Transit", date: "10 Dec 2025" },
-    { id: "122", trucks: 6, warehouse: "Warehouse E", status: "In Transit", date: "10 Dec 2025" },
-    { id: "122", trucks: 6, warehouse: "Warehouse E", status: "In Transit", date: "10 Dec 2025" },
-  ]);
+  const CURRENT_USER = "TruckDealer1"; // This should ideally come from Auth context
 
-  const visibleOrders = showAllOrders ? orderAssignments : orderAssignments.slice(0, 4);
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const truckRes = await axios.get(`http://localhost:5000/truck?username=${CURRENT_USER}`);
+        const trucks = truckRes.data;
+
+        const orderRes = await axios.get(`http://localhost:5000/accepted-orders/dealer/${CURRENT_USER}`);
+        const orders = orderRes.data;
+
+        const composition = trucks.reduce((acc, truck) => {
+          const type = truck.truckType || "Standard";
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;
+        }, {});
+
+        const fleetArray = Object.keys(composition).map(key => ({
+          type: key,
+          count: composition[key],
+          category: key === "Box Truck" ? "Medium Duty" : "Heavy Duty"
+        }));
+
+        setDealerInfo({
+          name: CURRENT_USER,
+          email: `${CURRENT_USER.toLowerCase()}@smarttruck.com`,
+          location: trucks.length > 0 ? trucks[0].route.from : "Remote",
+          totalTrucks: trucks.length,
+          available: trucks.filter(t => t.status === "Available").length,
+          totalOrders: orders.length
+        });
+
+        setFleetStats(fleetArray);
+        setOrderHistory(orders);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error loading profile:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [CURRENT_USER]);
+
+  const handleOpenModal = async (order) => {
+    setModalLoading(true);
+    try {
+      const [shipRes, truckRes] = await Promise.all([
+        axios.get(`http://localhost:5000/shipment-details/${order.sid}`),
+        axios.get(`http://localhost:5000/truck-details/${order.tid}`)
+      ]);
+      setSelectedOrder({
+        ...order,
+        shipmentDetails: shipRes.data,
+        truckDetails: truckRes.data
+      });
+    } catch (err) {
+      alert("Could not fetch original details");
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const visibleOrders = showAllOrders ? orderHistory : orderHistory.slice(0, 4);
+
+  if (loading) return <div className="loading-screen">Loading Profile...</div>;
 
   return (
     <div className="profile-wrapper">
-     <Navbar />
+      <Navbar />
 
       <main className="profile-main">
         <header className="profile-hero">
@@ -52,6 +106,7 @@ const Profile = () => {
               <h1>{dealerInfo.name}</h1>
               <div className="hero-badges">
                 <span className="badge-item"><Mail size={14} /> {dealerInfo.email}</span>
+                <span className="badge-item"><MapPin size={14} /> {dealerInfo.location}</span>
               </div>
             </div>
           </div>
@@ -76,7 +131,7 @@ const Profile = () => {
           <div className="stat-card-pro">
             <div className="stat-icon-wrap forest"><ClipboardList size={24} /></div>
             <div className="stat-info">
-              <label>Orders Completed</label>
+              <label>Total Assignments</label>
               <h3>{dealerInfo.totalOrders}</h3>
             </div>
           </div>
@@ -89,7 +144,7 @@ const Profile = () => {
               <BarChart3 size={18} className="header-icon" />
             </div>
             <div className="fleet-grid">
-              {fleet.map((f, i) => (
+              {fleetStats.map((f, i) => (
                 <div key={i} className="fleet-item-pro">
                   <div className="fleet-info">
                     <span className="fleet-name">{f.type}</span>
@@ -103,16 +158,17 @@ const Profile = () => {
 
           <section className="glass-panel recent-orders">
             <div className="panel-header">
-              <h3>Recent Order Highlights</h3>
+              <h3>Recent Activity</h3>
               <ClipboardList size={18} className="header-icon" />
             </div>
             <div className="activity-timeline">
-              {orderAssignments.slice(0, 4).map((o) => (
-                <div key={o.id} className="timeline-item">
+              {orderHistory.length === 0 ? <p className="empty-msg">No recent activity</p> : 
+               orderHistory.slice(0, 4).map((o) => (
+                <div key={o._id} className="timeline-item">
                   <div className="timeline-marker"></div>
                   <div className="timeline-content">
-                    <p>Order <strong>#{o.id}</strong> assigned to <strong>{o.warehouse}</strong></p>
-                    <span className="timeline-date">{o.date}</span>
+                    <p>Shipment <strong>{o.sid}</strong> linked to Truck <strong>{o.tid}</strong></p>
+                    <span className="timeline-date">{new Date(o.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
               ))}
@@ -133,20 +189,18 @@ const Profile = () => {
             <table className="pro-table">
               <thead>
                 <tr>
-                  <th>Order ID</th>
-                  <th>Fleet Size</th>
-                  <th>Destination/Warehouse</th>
+                  <th>Shipment ID</th>
+                  <th>Truck ID</th>
                   <th>Current Status</th>
-                  <th>Log Date</th>
+                  <th>Assignment Date</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {visibleOrders.map((o) => (
-                  <tr>
-                    <td className="bold">#{o.id}</td>
-                    <td>{o.trucks} Vehicles</td>
-                    <td>{o.warehouse}</td>
+                  <tr key={o._id}>
+                    <td className="bold">#{o.sid}</td>
+                    <td>{o.tid}</td>
                     <td>
                       <div className="status-container">
                         <span className={`status-pill-pro ${o.status.toLowerCase().replace(/\s/g, '-')}`}>
@@ -154,9 +208,9 @@ const Profile = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="date-cell">{o.date}</td>
+                    <td className="date-cell">{new Date(o.createdAt).toLocaleDateString()}</td>
                     <td className="action-cell">
-                      <button className="row-action-btn" title="View Details">
+                      <button className="row-action-btn" onClick={() => handleOpenModal(o)}>
                         <ExternalLink size={14} />
                       </button>
                     </td>
@@ -167,6 +221,46 @@ const Profile = () => {
           </div>
         </section>
       </main>
+      {selectedOrder && (
+        <div className="modal-overlay" onClick={() => setSelectedOrder(null)}>
+          <div className="detail-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Assignment Detailed View</h3>
+              <button className="close-btn" onClick={() => setSelectedOrder(null)}><X size={20}/></button>
+            </div>
+            
+            <div className="modal-body">
+              {/* Shipment Section */}
+              <div className="detail-section">
+                <div className="section-title"><Package size={16}/> Shipment Data</div>
+                <div className="data-grid">
+                  <div className="data-item"><label>Route</label><p>{selectedOrder.shipmentDetails?.origin} → {selectedOrder.shipmentDetails?.destination}</p></div>
+                  <div className="data-item"><label>Weight</label><p><Weight size={12}/> {selectedOrder.shipmentDetails?.weight} kg</p></div>
+                  <div className="data-item"><label>Volume</label><p><Ruler size={12}/> {selectedOrder.shipmentDetails?.volume} m³</p></div>
+                  <div className="data-item"><label>Deadline</label><p><Calendar size={12}/> {new Date(selectedOrder.shipmentDetails?.deadline).toLocaleDateString()}</p></div>
+                </div>
+              </div>
+
+              <div className="modal-divider"><span>LINKED TO</span></div>
+
+              {/* Truck Section */}
+              <div className="detail-section">
+                <div className="section-title"><Truck size={16}/> Truck Data</div>
+                <div className="data-grid">
+                  <div className="data-item"><label>Truck ID</label><p>#{selectedOrder.truckDetails?.truckId}</p></div>
+                  <div className="data-item"><label>Type</label><p>{selectedOrder.truckDetails?.truckType}</p></div>
+                  <div className="data-item"><label>Max Load</label><p>{selectedOrder.truckDetails?.capacityWeight} kg</p></div>
+                  <div className="data-item"><label>Rate</label><p>₹{selectedOrder.truckDetails?.pricePerKm}/km</p></div>
+                </div>
+              </div>
+
+              <div className="current-status-bar">
+                 Current Lifecycle Status: <strong>{selectedOrder.status}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
