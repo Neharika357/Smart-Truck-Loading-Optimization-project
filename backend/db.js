@@ -76,6 +76,16 @@ app.get('/truck', async (req, res) => {
     }
 });
 
+app.get('/truck-details/:tid', async (req, res) => {
+    try {
+        const truck = await TrucksInfo.findOne({ truckId: req.params.tid });
+        if (!truck) return res.status(404).json({ error: "Truck not found" });
+        res.status(200).json(truck);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.post('/create-shipment', async (req, res) => {
     try {
         const { weight, volume, origin, destination, deadline, username } = req.body;
@@ -119,6 +129,16 @@ app.post('/get-shipments', async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ error: "Could not fetch shipments" });
+    }
+});
+
+app.get('/shipment-details/:sid', async (req, res) => {
+    try {
+        const shipment = await ShipmentInfo.findOne({ sid: req.params.sid });
+        if (!shipment) return res.status(404).json({ error: "Shipment not found" });
+        res.status(200).json(shipment);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -205,6 +225,25 @@ app.post('/accept-order', async (req, res) => {
     }
 });
 
+app.post('/decline-request', async (req, res) => {
+    const { sid, tid } = req.body;
+    try {
+        await ShipmentOrder.deleteOne({ sid: sid, tid: tid });
+
+        await TruckOrder.deleteOne({ sid: sid, tid: tid });
+
+        await ShipmentInfo.findOneAndUpdate(
+            { sid: sid },
+            { status: "Pending" }
+        );
+
+        res.status(200).json({ message: "Request declined and cleanup complete" });
+    } catch (err) {
+        console.error("Decline Error:", err);
+        res.status(500).json({ error: "Failed to decline request" });
+    }
+});
+
 app.post('/update-truck-status', async (req, res) => {
     try {
         const { sid, tid, status } = req.body;
@@ -214,17 +253,17 @@ app.post('/update-truck-status', async (req, res) => {
         }
 
         const updateShipping = ShipmentOrder.findOneAndUpdate(
-            { sid: sid },
+            { sid: sid, tid: tid },
             { status: status }
         );
 
         const updateTrucks = TruckOrder.findOneAndUpdate(
-            { tid: tid },
+            { sid : sid, tid: tid },
             { status: status }
         );
 
         const updateAccepted = AcceptedOrder.findOneAndUpdate(
-            { $or: [{ sid: sid }, { tid: tid }] },
+            { sid : sid, tid: tid },
             { status: status }
         );
 
