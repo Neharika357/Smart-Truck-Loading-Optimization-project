@@ -10,7 +10,6 @@ const CURRENT_USER = "Warehouse1";
 
 const WarehouseDashboard = () => {
   const [shipments, setShipments] = useState([]);
-  const [notifications, setNotifications] = useState([]);
   const [modalData, setModalData] = useState(null); 
   const [feedbackMsg, setFeedbackMsg] = useState(null);
 
@@ -18,14 +17,6 @@ const WarehouseDashboard = () => {
 
   useEffect(() => {
     fetchShipments();
-    fetchNotifications();
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 30000); 
-    return () => clearInterval(interval);
   }, []);
 
   const fetchShipments = async () => {
@@ -41,25 +32,6 @@ const WarehouseDashboard = () => {
       }
     } catch (error) {
       console.error("Server error:", error);
-    }
-  };
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch(`http://localhost:5000/warehouse-orders/${CURRENT_USER}`);
-      const data = await response.json();
-      if (response.ok) {
-        const formattedNotifs = data.map(order => ({
-          id: order._id,
-          sid: order.sid,
-          tid: order.tid,
-          status: order.status, // Requested, Assigned, In Transit, etc.
-          time: new Date(order.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }));
-        setNotifications(formattedNotifs);
-      }
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
     }
   };
 
@@ -87,28 +59,15 @@ const WarehouseDashboard = () => {
       const newData = await response.json();
 
       if (response.ok) {
-        // Check for status changes
         newData.forEach(newItem => {
-          // Find the same shipment in our previous data
           const oldItem = shipmentsRef.current.find(old => old.sid === newItem.sid);
 
-          // IF it existed before AND status changed from 'Requested' to 'Assigned'
           if (oldItem && oldItem.status === 'Requested' && newItem.status === 'Assigned') {
             
-            // Add to Notifications
-            const newNotif = { 
-              title: 'Request Accepted!', 
-              msg: `Truck Dealer has accepted shipment ${newItem.sid}`, 
-              type: 'success', // Green color
-              time: 'Just now'
-            };
-            
-            setNotifications(prev => [newNotif, ...prev]);
             triggerFeedback(`Shipment ${newItem.sid} is now Assigned!`);
           }
         });
 
-        // Update the dashboard with new data
         setShipments(newData.map(item => ({ ...item, id: item.sid })));
       }
     } catch (error) {
@@ -116,7 +75,6 @@ const WarehouseDashboard = () => {
     }
   };
 
-  // --- END OF NEW CODE ---
   const handleAddShipment = async (formData) => {
     try {
         const response = await fetch('http://localhost:5000/create-shipment', {
@@ -155,14 +113,6 @@ const WarehouseDashboard = () => {
          setModalData(null); 
          fetchShipments(); 
  
-         const newNotif = { 
-           title: 'Request Sent', 
-           msg: `Waiting for approval on ${truckId} for ${modalData.id}`, 
-           type: 'pending',
-           time: 'Just now'
-         };
-         setNotifications([newNotif, ...notifications]);
- 
        } else {
          alert("Failed to send booking request.");
        }
@@ -187,7 +137,7 @@ const WarehouseDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <Navbar notifications={notifications} />
+      <Navbar  />
       
       <div style={styles.mainContent}>
         <div style={styles.leftPanel}>

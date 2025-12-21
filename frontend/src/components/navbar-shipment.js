@@ -1,12 +1,53 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Truck, LogOut, Bell, User } from 'lucide-react';
+import axios from "axios";
+import { Truck, LogOut, Bell, User, Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import '../styles/navbar-shipments.css'; 
 
-const Navbar = ({ notifications = [] }) => {
+const Navbar = () => {
     const navigate = useNavigate();
     const [showNotifs, setShowNotifs] = useState(false);
+    const [notifications, setNotifications] = useState([]);
     const notifRef = useRef(null);
+
+    const CURRENT_USER = "Warehouse1";
+
+    const fetchNotifications = async () => {
+        try {
+        const response = await fetch(`http://localhost:5000/warehouse-orders/${CURRENT_USER}`);
+        const data = await response.json();
+        if (response.ok) {
+            const formattedNotifs = data.map(order => ({
+            id: order._id,
+            sid: order.sid,
+            tid: order.tid,
+            status: order.status, // Requested, Assigned, In Transit, etc.
+            time: new Date(order.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }));
+            setNotifications(formattedNotifs);
+        }
+        } catch (error) {
+        console.error("Error fetching notifications:", error);
+        }
+    };
+
+    const handleDeleteOrder = async (sid, tid) => {
+        const confirmDelete = window.confirm(`Are you sure you want to clear the record for Shipment ${sid}?`);
+        if (!confirmDelete) return;
+
+        try {
+            const res = await axios.delete(`http://localhost:5000/delete-warehouse-order-request`, {
+                data: { sid, tid } 
+            });
+
+            if (res.status === 200) {
+                setNotifications(prev => prev.filter(n => !(n.sid === sid && n.tid === tid)));
+            }
+        } catch (err) {
+            console.error("Deletion failed", err);
+            alert("Failed to delete record.");
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -16,6 +57,17 @@ const Navbar = ({ notifications = [] }) => {
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        fetchNotifications();
+      }, []);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+        fetchNotifications();
+        }, 30000); 
+        return () => clearInterval(interval);
     }, []);
 
     return (
@@ -46,7 +98,6 @@ const Navbar = ({ notifications = [] }) => {
                                         ) : (
                                             notifications.map((n) => (
                                                 <div key={n.id} className="notif-item">
-                                                    {/* Absolute badge pinned to corner */}
                                                     <div className={`status-badge-corner ${n.status.toLowerCase().replace(/\s+/g, '-')}`}>
                                                         {n.status}
                                                     </div>
@@ -55,6 +106,16 @@ const Navbar = ({ notifications = [] }) => {
                                                         <p>Shipment <strong>{n.sid}</strong> status updated for Truck <strong>{n.tid}</strong></p>
                                                         <span className="shipment-subtext">Last update: {n.time}</span>
                                                     </div>
+
+                                                    {(n.status === "Accepted" || n.status === "Delivered") && (
+                                                        <button 
+                                                            className="delete-trigger-btn"
+                                                            onClick={() => handleDeleteOrder(n.sid, n.tid)}
+                                                            title="Dismiss"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ))
                                         )}

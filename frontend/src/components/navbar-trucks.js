@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {Truck, LogOut, Bell, User, BarChart3, Leaf, CheckCircle, AlertCircle } from 'lucide-react'
+import { Truck, LogOut, Bell, User, BarChart3, Leaf, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import '../styles/navbar-trucks.css'
@@ -70,6 +70,24 @@ const Navbar = ()=> {
         }
     };
 
+    const handleDeleteOrder = async (sid, tid) => {
+        const confirmDelete = window.confirm(`Are you sure you want to clear the record for Shipment ${sid}?`);
+        if (!confirmDelete) return;
+
+        try {
+            const res = await axios.delete(`http://localhost:5000/delete-dealer-order-request`, {
+                data: { sid, tid } 
+            });
+
+            if (res.status === 200) {
+                setNotifications(prev => prev.filter(n => !(n.sid === sid && n.tid === tid)));
+            }
+        } catch (err) {
+            console.error("Deletion failed", err);
+            alert("Failed to delete record.");
+        }
+    };
+
     useEffect(() => {
         const handleClickOutside = (event) => {
         if (notifRef.current && !notifRef.current.contains(event.target)) {
@@ -120,18 +138,26 @@ const Navbar = ()=> {
                                                         <p>Truck <strong>{n.tid}</strong> was requested by Shipment <strong>{n.sid}</strong></p>
                                                     ) : (
                                                         <>
-                                                            <p>Shipment <strong>{n.sid}</strong> status updated for Truck <strong>{n.tid}</strong></p>
-                                                            <span className="shipment-subtext">Last update: {n.time || 'Just now'}</span>
+                                                            <p>Shipment <strong>{n.sid}</strong> status updated to <strong>{n.status}</strong></p>
+                                                            <span className="shipment-subtext">Truck: {n.tid}</span>
                                                         </>
                                                     )}
                                                 </div>
 
                                                 {n.status === "Requested" && (
                                                     <div className="notif-actions">
-                                                        <button className="verify-btn" onClick={() => handleVerifyClick(n)}>
-                                                            Verify
-                                                        </button>
+                                                        <button className="verify-btn" onClick={() => handleVerifyClick(n)}>Verify</button>
                                                     </div>
+                                                )}
+
+                                                {n.status === "Delivered" && (
+                                                    <button 
+                                                        className="delete-trigger" 
+                                                        onClick={() => handleDeleteOrder(n.sid, n.tid)}
+                                                        title="Clear Record"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
