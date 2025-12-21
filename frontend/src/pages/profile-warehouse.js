@@ -7,14 +7,18 @@ import {
 } from 'lucide-react';
 import '../styles/profile-warehouse.css'; 
 import Navbar from '../components/navbar-shipment';
+import { useParams } from 'react-router-dom';
 
-const CURRENT_USER = "Warehouse1"; 
+
 
 const WarehouseProfile = () => {
   const [showAllHistory, setShowAllHistory] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+
+  const {username} = useParams();
+  const CURRENT_USER = username; 
 
   // User details state
   const [userInfo, setUserInfo] = useState({

@@ -13,11 +13,11 @@ function App() {
   return (
     <BrowserRouter>
         <Routes>
-            <Route path='/' element= {<TruckDashboard/>}/>
-            <Route path='/profile' element= {<Profile/>}/>
-            <Route path ='/shipments' element ={<WarehouseDashboard />} />
-            <Route path ='/user' element ={<WarehouseProfile />} />
-            <Route path ='/register' element={<Signup />} />
+            <Route path='/dealer/:username' element= {<TruckDashboard/>}/>
+            <Route path='/profile/:username' element= {<Profile/>}/>
+            <Route path ='/warehouse/:username' element ={<WarehouseDashboard />} />
+            <Route path ='/user/:username' element ={<WarehouseProfile />} />
+            <Route path ='/' element={<Signup />} />
             <Route path ='/login' element={<Login />} />
             <Route path ='/ForgotPassword' element={<ForgotPassword />} />
             <Route path ='/ResetPassword' element={<ResetPassword />} />

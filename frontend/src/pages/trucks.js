@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {  Plus, Search, CheckCircle} from 'lucide-react';
 import Navbar from '../components/navbar-trucks';
+import { useParams } from 'react-router-dom';
 import '../styles/trucks.css';
 
 const TruckDashboard = () => {
@@ -21,8 +22,7 @@ const TruckDashboard = () => {
     price: '',
     type: 'Box Truck'
   });
-
-  const username = "TruckDealer1"
+  const {username} = useParams();
   const fetchTrucks = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/truck`, {
@@ -111,7 +111,7 @@ const TruckDashboard = () => {
 };
   return (
     <div className="dashboard-wrapper">
-      <Navbar />
+      <Navbar  username={username}/>
       <main className="dashboard-grid">
         <aside className="form-sidebar">
           <div className="glass-card">

@@ -4,13 +4,13 @@ import { Truck, LogOut, Bell, User, Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import '../styles/navbar-shipments.css'; 
 
-const Navbar = () => {
+const Navbar = ({username}) => {
     const navigate = useNavigate();
     const [showNotifs, setShowNotifs] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const notifRef = useRef(null);
 
-    const CURRENT_USER = "Warehouse1";
+    const CURRENT_USER = username;
 
     const fetchNotifications = async () => {
         try {
@@ -124,7 +124,7 @@ const Navbar = () => {
                             )}
                         </div>
 
-                        <User size={20} className="action-icon" onClick={() => navigate('/user')} />
+                        <User size={20} className="action-icon" onClick={() => navigate(`/user/${username}`)} />
                         
                         <button className="logout-pill"><LogOut size={16} /> Logout</button>
                     </div>

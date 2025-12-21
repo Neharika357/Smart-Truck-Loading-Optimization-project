@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
+import '../styles/auth.css'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -22,7 +23,7 @@ const login = async (email, password) => {
     throw new Error(data.message || 'Login failed');
   }
 
-  return data;
+  return data; 
 };
 
 function PrimaryButton({ children, loading, disabled, type = 'button', className = '', ...rest }) {
@@ -90,13 +91,19 @@ function Login() {
       setLoading(true);
       
       const response = await login(email, password);
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('role', response.role);
+      
+      const { token, role, user } = response;
+      const fullName = user.fullName; // This is the 'username' you need
 
-      if (response.role === 'warehouse') {
-        navigate('/warehouse/dashboard');
+      // 3. Save to storage
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('role', role);
+
+      // 4. Navigate using the fullName variable
+      if (role === 'warehouse') {
+        navigate(`/warehouse/${fullName}`);
       } else {
-        navigate('/dealer/dashboard');
+        navigate(`/dealer/${fullName}`);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -128,7 +135,7 @@ function Login() {
       </form>
       
       <div className="mt-6 text-center text-sm text-gray-600">
-        Don't have an account? <Link to="/auth/signup" className="text-green-600 font-bold hover:underline">Sign up</Link>
+        Don't have an account? <Link to="/" className="text-green-600 font-bold hover:underline">Sign up</Link>
       </div>
     </div>
   );

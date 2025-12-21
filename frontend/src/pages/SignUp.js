@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
+import '../styles/auth.css'
 
 const register = async (userData) => {
   // 🔥 IMPORTANT FIX:
@@ -174,7 +175,7 @@ const handleNextStep = (e) => {
     const response = await register(payload);
     localStorage.setItem('authToken', response.token);
     localStorage.setItem('role', formData.role);
-    navigate(formData.role === 'warehouse' ? '/warehouse/dashboard' : '/dealer/dashboard');
+    navigate(formData.role === 'warehouse' ? `/warehouse/${formData.fullName}` :`/dealer/${formData.fullName}`);
   } catch (err) {
     setApiError(err.message || 'Signup failed');
   } finally {
@@ -271,7 +272,7 @@ const handleNextStep = (e) => {
       {step === 1 && (
         <p className="text-center mt-6">
           Already have an account?{' '}
-          <Link to="/auth/login" className="text-green-600 font-bold">
+          <Link to="/login" className="text-green-600 font-bold">
             Login
           </Link>
         </p>

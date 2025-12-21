@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { z } from 'zod';
+import '../styles/auth.css'
 
 function TextInput({ label, id, type = 'text', value, onChange, placeholder, error }) {
   return (

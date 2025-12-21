@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Truck, BarChart3, Mail, Package, ClipboardList, ChevronRight, ExternalLink, MapPin, X, Weight, Ruler, Calendar } from 'lucide-react';
 import '../styles/profile-trucks.css';
@@ -23,7 +24,8 @@ const Profile = () => {
   const [fleetStats, setFleetStats] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
 
-  const CURRENT_USER = "TruckDealer1"; // This should ideally come from Auth context
+  const {username} = useParams();
+  const CURRENT_USER = username;
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -69,7 +71,7 @@ const Profile = () => {
     };
 
     fetchProfileData();
-  }, [CURRENT_USER]);
+  }, []);
 
   const handleOpenModal = async (order) => {
     setModalLoading(true);
@@ -96,7 +98,7 @@ const Profile = () => {
 
   return (
     <div className="profile-wrapper">
-      <Navbar />
+      <Navbar username={CURRENT_USER} />
 
       <main className="profile-main">
         <header className="profile-hero">

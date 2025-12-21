@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import '../styles/navbar-trucks.css'
 
-const Navbar = ()=> {
+const Navbar = ({username})=> {
     const navigate = useNavigate();
     const [verifyingShipment, setVerifyingShipment] = useState(null); 
     const [shipmentDetails, setShipmentDetails] = useState(null);
@@ -15,7 +15,7 @@ const Navbar = ()=> {
     const [notifications, setNotifications] = useState([]);
     const notifRef = useRef(null);
 
-    const activeDealer = "TruckDealer1"; 
+    const activeDealer = username; 
 
     const fetchNotifs = async () => {
         try {
@@ -167,7 +167,7 @@ const Navbar = ()=> {
                             </div>
                         )}
                     </div>
-                    <User size={20} className="action-icon" onClick={() => navigate('/profile')} />
+                    <User size={20} className="action-icon" onClick={() => navigate(`/profile/${activeDealer}`)} />
                     <button className="logout-pill"><LogOut size={16} /> Logout</button>
                     </div>
                 </div>

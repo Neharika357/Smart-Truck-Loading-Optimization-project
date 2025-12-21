@@ -1,4 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import Navbar from '../components/navbar-shipment';
 import CreateShipment from '../components/createShipment';
 import ShipmentList from '../components/shipmentList';
@@ -6,14 +7,16 @@ import TruckSelectionModal from '../components/truckSelectionModel';
 import { CheckCircle } from 'lucide-react';
 import '../styles/shipments.css';
 
-const CURRENT_USER = "Warehouse1"; 
-
 const WarehouseDashboard = () => {
   const [shipments, setShipments] = useState([]);
   const [modalData, setModalData] = useState(null); 
   const [feedbackMsg, setFeedbackMsg] = useState(null);
 
   const [filterStatus, setFilterStatus] = useState('All'); 
+
+  
+  const {username} = useParams();
+  const CURRENT_USER = username; 
 
   useEffect(() => {
     fetchShipments();
@@ -138,7 +141,7 @@ const WarehouseDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <Navbar  />
+      <Navbar  username={username}/>
       
       <div style={styles.mainContent}>
         <div style={styles.leftPanel}>
