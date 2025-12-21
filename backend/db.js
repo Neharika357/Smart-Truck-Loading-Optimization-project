@@ -537,6 +537,128 @@ app.get('/user/:username', async(req, res) =>{
    
 })
 
+// 1. Update Shipment Details
+app.put('/update-shipment/:sid', async (req, res) => {
+    try {
+        const { sid } = req.params;
+        const updateData = req.body;
+
+        // Protect critical fields: Don't allow changing the ID or the Owner via this route
+        delete updateData.sid; 
+        delete updateData._id;
+        delete updateData.warehouseUser;
+
+        // If updating date, ensure it's formatted correctly
+        if (updateData.deadline) {
+            updateData.deadline = new Date(updateData.deadline);
+        }
+
+        const updatedShipment = await ShipmentInfo.findOneAndUpdate(
+            { sid: sid },
+            { $set: updateData },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedShipment) {
+            return res.status(404).json({ error: "Shipment not found" });
+        }
+
+        console.log(`Shipment ${sid} updated`);
+        res.status(200).json({ message: "Shipment updated successfully", shipment: updatedShipment });
+    } catch (err) {
+        console.error("Error updating shipment:", err);
+        res.status(500).json({ error: "Failed to update shipment" });
+    }
+});
+
+// 2. Delete Shipment
+app.delete('/delete-shipment/:sid', async (req, res) => {
+    try {
+        const { sid } = req.params;
+
+        // A. Delete the Shipment itself
+        const deletedShipment = await ShipmentInfo.findOneAndDelete({ sid: sid });
+
+        if (!deletedShipment) {
+            return res.status(404).json({ error: "Shipment not found" });
+        }
+
+        // B. CLEANUP: Delete any related orders/requests for this shipment
+        // This ensures no "Ghost Requests" remain in the system
+        await ShipmentOrder.deleteMany({ sid: sid });
+        await TruckOrder.deleteMany({ sid: sid });
+        await AcceptedOrder.deleteMany({ sid: sid });
+
+        console.log(`Shipment ${sid} and all related records deleted`);
+        res.status(200).json({ message: "Shipment deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting shipment:", err);
+        res.status(500).json({ error: "Failed to delete shipment" });
+    }
+});
+
+app.put('/update-truck/:truckId', async (req, res) => {
+    try {
+        const { truckId } = req.params;
+        const updateData = req.body;
+
+        // Protect critical fields
+        delete updateData.truckId;
+        delete updateData._id;
+        delete updateData.dealerId;
+
+        const updatedTruck = await TrucksInfo.findOneAndUpdate(
+            { truckId: truckId },
+            { $set: updateData },
+            { new: true }
+        );
+
+        if (!updatedTruck) {
+            return res.status(404).json({ error: "Truck not found" });
+        }
+
+        console.log(`Truck ${truckId} updated`);
+        res.status(200).json({ message: "Truck updated successfully", truck: updatedTruck });
+    } catch (err) {
+        console.error("Error updating truck:", err);
+        res.status(500).json({ error: "Failed to update truck" });
+    }
+});
+
+// 4. Delete Truck
+app.delete('/delete-truck/:truckId', async (req, res) => {
+    try {
+        const { truckId } = req.params;
+
+        // A. Check if truck is currently busy (Optional safety check)
+        // const truck = await TrucksInfo.findOne({ truckId });
+        // if (truck && truck.status === "In Use") {
+        //     return res.status(400).json({ error: "Cannot delete a truck that is currently delivering an order." });
+        // }
+
+        // B. Delete the Truck
+        const deletedTruck = await TrucksInfo.findOneAndDelete({ truckId: truckId });
+
+        if (!deletedTruck) {
+            return res.status(404).json({ error: "Truck not found" });
+        }
+
+        // C. CLEANUP: Delete related orders/requests
+        // Remove requests from Dealer view
+        await TruckOrder.deleteMany({ tid: truckId });
+        // Remove accepted orders
+        await AcceptedOrder.deleteMany({ tid: truckId });
+        // Remove requests from Warehouse view (so they don't see a requested truck that no longer exists)
+        await ShipmentOrder.deleteMany({ tid: truckId });
+
+        console.log(`Truck ${truckId} and all related records deleted`);
+        res.status(200).json({ message: "Truck deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting truck:", err);
+        res.status(500).json({ error: "Failed to delete truck" });
+    }
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
