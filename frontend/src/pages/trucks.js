@@ -10,7 +10,8 @@ const TruckDashboard = () => {
   const [statusFilter, setStatusFilter] = useState('All'); 
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [selectedTruck, setSelectedTruck] = useState(null);
-  
+  const [successMessage, setSuccessMessage] = useState({ title: "", sub: "" });
+
   const [formData, setFormData] = useState({
     weight: '',
     volume: '',
@@ -21,9 +22,7 @@ const TruckDashboard = () => {
   });
 
   const username = "TruckDealer1"
-
-  useEffect(() => {
-    const fetchTrucks = async () => {
+  const fetchTrucks = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/truck`, {
             params: { username: username }
@@ -33,7 +32,16 @@ const TruckDashboard = () => {
         console.error("Error fetching trucks:", err);
       }
     };
+
+  useEffect(() => {   
     fetchTrucks();
+  }, []);
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+        fetchTrucks();
+      }, 30000); 
+      return () => clearInterval(interval);
   }, []);
 
   const handleRegister = async () => {
@@ -45,6 +53,7 @@ const TruckDashboard = () => {
       
       setTrucks([response.data.TrucksInfo, ...trucks]);
       setFormData({ weight: '', volume: '', from: '', to: '', price: '', type: 'Box Truck' });
+      setSuccessMessage({ title: "Truck Registered!", sub: "Vehicle added to the active fleet" });
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2500);
     } catch (err) {
@@ -61,6 +70,36 @@ const TruckDashboard = () => {
     setIsStatusDialogOpen(true);
   };
 
+  const handleStatusChange = async (newStatus) => {
+  if (!selectedTruck) return;
+  try {
+    await axios.post('http://localhost:5000/update-truck-status', {
+      tid: selectedTruck.truckId,
+      sid: selectedTruck.assignedShipment, 
+      status: newStatus
+    });
+
+    // Update local state
+    setTrucks(trucks.map(t => 
+      t.truckId === selectedTruck.truckId 
+        ? { ...t, status: newStatus === "Delivered" ? "Available" : "In Use" } 
+        : t
+    ));
+
+    // Set Dynamic Success Message
+    setSuccessMessage({
+      title: "Status Updated!",
+      sub: `Truck ${selectedTruck.truckId} is now ${newStatus}`
+    });
+    
+    setIsStatusDialogOpen(false);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+  } catch (err) {
+    console.error(err);
+    alert("Update failed.");
+  }
+};
   return (
     <div className="dashboard-wrapper">
       <Navbar />
@@ -190,7 +229,7 @@ const TruckDashboard = () => {
                   key={s} 
                   className="status-opt-btn"
                   onClick={() => {
-                    /* Add axios.put call here to update backend */
+                    handleStatusChange(s)
                     setIsStatusDialogOpen(false);
                   }}
                 >
@@ -203,15 +242,14 @@ const TruckDashboard = () => {
         </div>
       )}
       {showSuccess && (
-        <div className="modal-overlay blur-bg intense animate-fade-in">
+        <div className="modal-overlay blur-bg intense">
           <div className="verification-box glass-card feedback-popup">
             <div className="feedback-view">
               <div className="success-icon-animate">
-                <CheckCircle color="#2d6a4f" size={80} strokeWidth={1.5} />
+                <CheckCircle color="#15803d" size={60} />
               </div>
-              <h3>Truck Registered!</h3>
-              <p>Vehicle has been added to the active fleet.</p>
-              <span className="sub-text">Updating your dashboard...</span>
+              <h3 style={{ color: '#1e293b', fontSize: '1.5rem' }}>{successMessage.title}</h3>
+              <p style={{ color: '#64748b', marginTop: '8px' }}>{successMessage.sub}</p>
             </div>
           </div>
         </div>

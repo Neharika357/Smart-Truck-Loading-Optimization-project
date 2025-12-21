@@ -222,3 +222,83 @@ body{
   font-size: 1.1rem;
 }
 
+.status-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 1.5rem 0;
+}
+
+.status-opt-btn {
+  padding: 1rem;
+  border: 2px solid #edf2f7;
+  border-radius: 12px;
+  background: white;
+  color: #4a5568;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.status-opt-btn:hover {
+  border-color: #3182ce;
+  color: #3182ce;
+  background: #ebf8ff;
+  transform: scale(1.02);
+}
+
+/* Status specific colors for the UI */
+.status-pill.assigned { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.status-pill.picked { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+.status-pill.in-transit { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+.status-pill.delivered { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+/* Highlighted Status Options in Modal */
+.status-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.status-opt-btn {
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: #f8fafc;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Individual button hover colors */
+.status-opt-btn:nth-child(1):hover { background: #e0f2fe; color: #0369a1; border-color: #0369a1; }
+.status-opt-btn:nth-child(2):hover { background: #fef9c3; color: #a16207; border-color: #a16207; }
+.status-opt-btn:nth-child(3):hover { background: #ede9fe; color: #6d28d9; border-color: #6d28d9; }
+.status-opt-btn:nth-child(4):hover { background: #dcfce7; color: #15803d; border-color: #15803d; }
+
+/* Feedback Popup Animation */
+.feedback-popup {
+  text-align: center;
+  padding: 40px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.success-icon-animate {
+  background: #f0fdf4;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}

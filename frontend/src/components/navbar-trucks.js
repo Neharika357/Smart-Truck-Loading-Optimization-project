@@ -30,10 +30,10 @@ const Navbar = ()=> {
 
     useEffect(() => {
         fetchNotifs(); 
-        const interval = setInterval(fetchNotifs, 60000);
+        const interval = setInterval(fetchNotifs, 30000);
         return () => clearInterval(interval);
     }, [activeDealer]);
-
+    
     const handleVerifyClick = async (notif) => {
         try {
             const [shipmentRes, truckRes] = await Promise.all([

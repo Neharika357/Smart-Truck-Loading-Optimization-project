@@ -8,7 +8,7 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
       co2: 'Low', rating: 4.8, capacity: '3000kg' 
     },
     { 
-      id: 'T3667', dealer: 'Green Move', match: 85, cost: 9500, 
+      id: 'T9530', dealer: 'Green Move', match: 85, cost: 9500, 
       co2: 'Very Low', rating: 4.5, capacity: '2500kg' 
     },
     { 

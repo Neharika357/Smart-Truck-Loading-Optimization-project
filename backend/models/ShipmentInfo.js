@@ -10,6 +10,7 @@ var shipmentInfoschema = new Schema({
     destination :{type: String, required:true},
     deadline :{type: Date, required:true},
     warehouseUser :{type: mongoose.Schema.Types.ObjectId, ref: 'WarehouseUser', required: true},
+    AssignedTruck : {type: String},
     status :{type: String, required:true},
 }, {timestamps: true});
 

@@ -30,6 +30,9 @@ const truckSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  assignedShipment: {
+    type: String
+  },
   status: { // Matches 'status'
     type: String,
     enum: ['Available', 'In Use', 'Maintenance'],

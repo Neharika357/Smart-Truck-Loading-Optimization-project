@@ -189,19 +189,31 @@ app.post('/accept-order', async (req, res) => {
     try {
         const { sid, tid } = req.body;
 
-        console.log(`Accepting Order: Shipment ${sid} <-> Truck ${tid}`);
-
         const shipmentDoc = await ShipmentInfo.findOne({ sid });
         const truckDoc = await TrucksInfo.findOne({ truckId: tid });
 
+        if (!shipmentDoc || !truckDoc) {
+            return res.status(404).json({ error: "Shipment or Truck not found" });
+        }
+
+        if (truckDoc.assignedShipment || truckDoc.status === "In Use") {
+            return res.status(400).json({ error: "Truck is already assigned to another shipment." });
+        }
+
         await ShipmentInfo.findOneAndUpdate(
             { sid: sid },
-            { status: "Assigned" } 
+            { 
+                status: "Assigned",
+                AssignedTruck: truckDoc.truckId 
+            } 
         );
 
         await TrucksInfo.findOneAndUpdate(
             { truckId: tid },
-            { status: "In Use" }
+            { 
+                status: "In Use",
+                assignedShipment: shipmentDoc.sid
+            }
         );
 
         await ShipmentOrder.findOneAndUpdate(
@@ -223,15 +235,7 @@ app.post('/accept-order', async (req, res) => {
         });
         await newAcceptedOrder.save();
 
-        const finalShipmentLog = new ShipmentOrder({
-            sid: sid,
-            tid: tid,
-            warehouse: shipmentDoc.warehouseUser,
-            status: "Assigned"
-        });
-        await finalShipmentLog.save();
-
-        res.status(200).json({ message: "Order Accepted. Truck and Shipment assigned successfully." });
+        res.status(200).json({ message: "Order Accepted and cross-references updated." });
 
     } catch (err) {
         console.error("Error accepting order:", err);
@@ -266,40 +270,34 @@ app.post('/update-truck-status', async (req, res) => {
             return res.status(400).json({ error: "Missing sid, tid, or status" });
         }
 
-        const updateShipping = ShipmentOrder.findOneAndUpdate(
-            { sid: sid, tid: tid },
-            { status: status }
-        );
-
-        const updateTrucks = TruckOrder.findOneAndUpdate(
-            { sid : sid, tid: tid },
-            { status: status }
-        );
-
-        const updateAccepted = AcceptedOrder.findOneAndUpdate(
-            { sid : sid, tid: tid },
-            { status: status }
-        );
+        const updateShipping = ShipmentOrder.findOneAndUpdate({ sid, tid }, { status });
+        const updateTrucks = TruckOrder.findOneAndUpdate({ sid, tid }, { status });
+        const updateAccepted = AcceptedOrder.findOneAndUpdate({ sid, tid }, { status });
 
         await Promise.all([updateShipping, updateTrucks, updateAccepted]);
 
         if (status === "Delivered") {
             await ShipmentInfo.findOneAndUpdate(
                 { sid: sid },
-                { status: "Delivered" }
+                { 
+                    status: "Delivered"
+                }
             );
 
-            await TruckInfo.findOneAndUpdate(
-                {truckId : tid},
-                {status : "Available"}
-            )
+            await TrucksInfo.findOneAndUpdate(
+                { truckId: tid },
+                { 
+                    status: "Available",
+                    assignedShipment: null 
+                }
+            );
         }
 
-        console.log(`Status updated to ${status} for Shipment ${sid} / Truck ${tid}`);
-        res.status(200).json({ message: `Status successfully updated to ${status}` });
+        console.log(`Lifecycle status: ${status} for S:${sid} | T:${tid}`);
+        res.status(200).json({ message: `Status updated to ${status}. References cleared if delivered.` });
 
     } catch (err) {
-        console.error("Error updating multi-collection status:", err);
+        console.error("Error updating status:", err);
         res.status(500).json({ error: "Failed to update status across collections" });
     }
 });
