@@ -78,7 +78,7 @@ const WarehouseProfile = () => {
     };
 
     fetchProfileData();
-  }, []);
+  }, [CURRENT_USER]);
 
   const handleOpenModal = async (order) => {
     setModalLoading(true);

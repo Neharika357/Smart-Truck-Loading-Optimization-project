@@ -86,6 +86,15 @@ app.get('/truck-details/:tid', async (req, res) => {
     }
 });
 
+app.get('/available-trucks', async (req, res) => {
+    try {
+        const trucks = await TrucksInfo.find({ status: "Available" });
+        res.status(200).json(trucks);
+    } catch (err) {
+        res.status(500).json({ error: "Search failed" });
+    }
+});
+
 app.post('/create-shipment', async (req, res) => {
     try {
         const { weight, volume, origin, destination, deadline, username } = req.body;

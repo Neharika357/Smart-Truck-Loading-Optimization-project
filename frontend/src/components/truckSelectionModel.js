@@ -1,29 +1,27 @@
 import React from 'react';
-import { FaLeaf, FaRupeeSign, FaRoute, FaTruck } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaLeaf, FaRupeeSign, FaRoute, FaTruck, FaClock } from 'react-icons/fa';
+import { getOptimizedTrucks } from '../utils/optimizationEngine';
 
 const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
-  const suggestedTrucks = [
-    { 
-      id: '#T3003', dealer: '#T01', match: 98, cost: 12000, 
-      co2: 'Low', rating: 4.8, capacity: '3000kg' 
-    },
-    { 
-      id: 'T9530', dealer: 'Green Move', match: 85, cost: 9500, 
-      co2: 'Very Low', rating: 4.5, capacity: '2500kg' 
-    },
-    { 
-      id: 'T1497', dealer: 'FastTracks', match: 72, cost: 14500, 
-      co2: 'Medium', rating: 4.2, capacity: '4000kg' 
-    },
-    { 
-      id: 'T-305', dealer: 'Eco Trans', match: 65, cost: 11000, 
-      co2: 'Low', rating: 4.0, capacity: '3500kg' 
-    },
-    { 
-      id: 'T-410', dealer: 'City Cargo', match: 60, cost: 13200, 
-      co2: 'High', rating: 3.8, capacity: '5000kg' 
-    },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [suggestedTrucks, setSuggestedTrucks] = useState([]);
+
+  useEffect(() => {
+    const fetchAndOptimize = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/available-trucks');
+        const allTrucks = await response.json();
+        const optimized = getOptimizedTrucks(shipmentData, allTrucks); // Using Core Logic
+        setSuggestedTrucks(optimized);
+      } catch (error) {
+        console.error("Optimization error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAndOptimize();
+  }, [shipmentData]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -41,7 +39,7 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
         <div style={styles.grid}>
           {suggestedTrucks.map((truck) => (
             
-            <div key={truck.id} className="truck-card">
+            <div key={truck.truckId} className="truck-card">
               
               <div style={styles.matchBadge}>
                 {truck.match}% Match
@@ -49,17 +47,17 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
 
               <div>
                 <h3 style={{ margin: '0 0 5px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FaTruck color="#4b5563"/> {truck.id}
+                  <FaTruck color="#4b5563"/> {truck.truckId}
                 </h3>
-                <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '15px' }}>
+                {/* <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '15px' }}>
                   by {truck.dealer} <span style={{ color: '#fbbf24' }}>★ {truck.rating}</span>
-                </div>
+                </div> */}
               </div>
 
               <div style={styles.statsGrid}>
                 <div style={styles.statItem}>
                   <FaRupeeSign color="#10b981"/> 
-                  <span>₹{truck.cost}</span>
+                  <span>₹{truck.estimatedCost}</span>
                 </div>
                 <div style={styles.statItem}>
                   <FaLeaf color="green"/> 
@@ -67,7 +65,7 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
                 </div>
                 <div style={styles.statItem}>
                   <FaRoute color="gray"/> 
-                  <span>{truck.capacity}</span>
+                  <span>{truck.capacityVolume}</span>
                 </div>
               </div>
 
