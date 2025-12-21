@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Warehouse, Package, TrendingUp, Clock, History, ChevronRight, ExternalLink, MapPin, Box } from 'lucide-react';
-import '../styles/profile-warehouse.css'; // Uses the same CSS file as the truck page
+import '../styles/profile-warehouse.css'; 
 import Navbar from '../components/navbar-shipment';
+
+const CURRENT_USER = "Warehouse1"; // Make sure this matches your logged-in user
 
 const WarehouseProfile = () => {
   const [showAllHistory, setShowAllHistory] = useState(false);
 
-  const [userInfo] = useState({
+  // 1. Changed to allow updates (setUserInfo)
+  const [userInfo, setUserInfo] = useState({
     name: "Central Hub Hyderabad",
     email: "manager.hyd@smarttruck.com",
     location: "Hyderabad, Telangana",
     totalCapacity: "15,000 m³",
     utilization: "82%",
-    pendingRequests: 14
+    pendingRequests: 0 // We will update this dynamically
   });
 
   const [storageStats] = useState([
@@ -22,15 +25,47 @@ const WarehouseProfile = () => {
     { type: "Docking Bay", count: "12 Trucks", category: "Active" }
   ]);
 
-  const [shipmentHistory] = useState([
-    { id: "S124", type: "Electronics", route: "Hyd → Mumbai", status: "Processing", date: "19 Dec 2025", weight: "750 kg" },
-    { id: "S123", type: "Textiles", route: "Hyd → Delhi", status: "Dispatched", date: "18 Dec 2025", weight: "1200 kg" },
-    { id: "S119", type: "Perishables", route: "Chennai → Hyd", status: "Stored", date: "17 Dec 2025", weight: "500 kg" },
-    { id: "S115", type: "Auto Parts", route: "B'lore → Hyd", status: "Inbound", date: "16 Dec 2025", weight: "2100 kg" },
-    { id: "S112", type: "Furniture", route: "Hyd → Pune", status: "Dispatched", date: "15 Dec 2025", weight: "900 kg" },
-    { id: "S108", type: "Chemicals", route: "Hyd → Vizag", status: "Processing", date: "14 Dec 2025", weight: "1400 kg" },
-    { id: "S108", type: "Chemicals", route: "Hyd → Vizag", status: "Processing", date: "14 Dec 2025", weight: "1400 kg" },
-  ]);
+  // 2. Changed to empty array initially, and added setShipmentHistory
+  const [shipmentHistory, setShipmentHistory] = useState([]);
+
+  // 3. New Effect to Fetch Real Data from Database
+  useEffect(() => {
+    fetchRealOrders();
+  }, []);
+
+  const fetchRealOrders = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-shipments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: CURRENT_USER })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && Array.isArray(data)) {
+        // Map Database fields to UI fields
+        const formattedData = data.map(item => ({
+          id: item.sid,
+          type: "General Cargo", // Backend doesn't have 'type' yet, so we use a default
+          route: `${item.origin} → ${item.destination}`,
+          status: item.status,
+          date: new Date(item.deadline).toLocaleDateString(), // displaying deadline or created date
+          weight: `${item.weight} kg`
+        }));
+
+        setShipmentHistory(formattedData);
+
+        // Update pending requests count based on real data
+        setUserInfo(prev => ({
+          ...prev,
+          pendingRequests: formattedData.filter(s => s.status === 'Pending' || s.status === 'Requested').length
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching profile history:", error);
+    }
+  };
 
   const visibleHistory = showAllHistory ? shipmentHistory : shipmentHistory.slice(0, 4);
 
@@ -107,15 +142,20 @@ const WarehouseProfile = () => {
               <History size={18} className="header-icon" />
             </div>
             <div className="activity-timeline">
-              {shipmentHistory.slice(0, 4).map((s) => (
-                <div key={s.id} className="timeline-item">
-                  <div className="timeline-marker" style={{ background: '#10b981' }}></div>
-                  <div className="timeline-content">
-                    <p>Shipment <strong>#{s.id}</strong> marked as <strong>{s.status}</strong></p>
-                    <span className="timeline-date">{s.date} • {s.route}</span>
+              {/* If history is empty, show a message */}
+              {shipmentHistory.length === 0 ? (
+                <p style={{padding:'20px', color:'#fff'}}>No recent activity found.</p>
+              ) : (
+                shipmentHistory.slice(0, 4).map((s) => (
+                  <div key={s.id} className="timeline-item">
+                    <div className="timeline-marker" style={{ background: '#10b981' }}></div>
+                    <div className="timeline-content">
+                      <p>Shipment <strong>#{s.id}</strong> marked as <strong>{s.status}</strong></p>
+                      <span className="timeline-date">{s.date} • {s.route}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </section>
         </div>

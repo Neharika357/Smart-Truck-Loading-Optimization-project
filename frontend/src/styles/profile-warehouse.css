@@ -190,3 +190,31 @@ body {
 .status-pill-pro.stored { background: #e9d8fd; color: #553c9a; } /* Purple */
 .status-pill-pro.inbound { background: #bee3f8; color: #2c5282; } /* Blue */
 .status-pill-pro.dispatched { background: #c6f6d5; color: #22543d; } /* Green */
+/* --- Add these to the bottom of profile-warehouse.css --- */
+
+/* --- Paste this at the bottom of profile-warehouse.css --- */
+
+/* 1. Requested / Pending (Bold Dark Orange) */
+.status-pill-pro.requested, 
+.status-pill-pro.pending {
+    background-color: #feebc8;
+    color: #744210;             /* Dark, bold Orange */
+    border: 1px solid #ffedd5;
+    font-size: 0.75rem; font-weight: 800       /* BOLD */
+}
+
+/* 2. Assigned (Bold Dark Blue) */
+.status-pill-pro.assigned {
+    background-color:#bee3f8;
+    color:  #2c5282;             /* Dark, bold Blue */
+    border: 1px solid #dbeafe;
+    font-size: 0.75rem; font-weight: 800          /* BOLD */
+}
+
+/* 3. Delivered (Bold Dark Green) */
+.status-pill-pro.delivered {
+    background-color: #c6f6d5;
+    color:  #22543d;             /* Dark, bold Green */
+    border: 1px solid #dcfce7;
+    font-size: 0.75rem; font-weight: 800          /* BOLD */
+}
