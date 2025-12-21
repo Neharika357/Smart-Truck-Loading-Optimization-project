@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {  Plus, Search, CheckCircle} from 'lucide-react';
+import { Plus, Search, CheckCircle, Edit, Trash2 } from 'lucide-react'; 
 import Navbar from '../components/navbar-trucks';
 import { useParams } from 'react-router-dom';
 import '../styles/trucks.css';
@@ -10,19 +10,21 @@ const TruckDashboard = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [statusFilter, setStatusFilter] = useState('All'); 
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  
+  // --- EDIT MODAL STATE ---
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTruck, setEditingTruck] = useState(null);
+
   const [selectedTruck, setSelectedTruck] = useState(null);
   const [successMessage, setSuccessMessage] = useState({ title: "", sub: "" });
   const [searchQuery, setSearchQuery] = useState('');
 
   const [formData, setFormData] = useState({
-    weight: '',
-    volume: '',
-    from: '',
-    to: '',
-    price: '',
-    type: 'Box Truck'
+    weight: '', volume: '', from: '', to: '', price: '', type: 'Box Truck'
   });
-  const {username} = useParams();
+
+  const { username } = useParams();
+
   const fetchTrucks = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/truck`, {
@@ -32,9 +34,9 @@ const TruckDashboard = () => {
       } catch (err) {
         console.error("Error fetching trucks:", err);
       }
-    };
+  };
 
-  useEffect(() => {   
+  useEffect(() => {    
     fetchTrucks();
   }, []);
 
@@ -45,13 +47,46 @@ const TruckDashboard = () => {
       return () => clearInterval(interval);
   }, []);
 
+  // --- DELETE FUNCTION ---
+  const handleDelete = async (truckId) => {
+    if (!window.confirm("Are you sure you want to delete this truck?")) return;
+    try {
+        await axios.delete(`http://localhost:5000/delete-truck/${truckId}`);
+        setTrucks(trucks.filter(t => t.truckId !== truckId));
+        setSuccessMessage({ title: "Deleted!", sub: "Truck removed from fleet" });
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+    } catch (err) {
+        alert("Failed to delete truck");
+    }
+  };
+
+  // --- EDIT FUNCTIONS ---
+  const openEditModal = (truck) => {
+    setEditingTruck({ ...truck }); 
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+        await axios.put(`http://localhost:5000/update-truck/${editingTruck.truckId}`, editingTruck);
+        setTrucks(trucks.map(t => (t.truckId === editingTruck.truckId ? editingTruck : t)));
+        setIsEditModalOpen(false);
+        setSuccessMessage({ title: "Updated!", sub: "Truck details saved successfully" });
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+    } catch (err) {
+        alert("Failed to update truck");
+        console.error(err);
+    }
+  };
+
   const handleRegister = async () => {
     try {
       const response = await axios.post('http://localhost:5000/create-truck', {
         ...formData,
         username: username
       });
-      
       setTrucks([response.data.TrucksInfo, ...trucks]);
       setFormData({ weight: '', volume: '', from: '', to: '', price: '', type: 'Box Truck' });
       setSuccessMessage({ title: "Truck Registered!", sub: "Vehicle added to the active fleet" });
@@ -64,13 +99,11 @@ const TruckDashboard = () => {
 
   const filteredTrucks = trucks.filter(truck => {
     const matchesStatus = statusFilter === 'All' ? true : truck.status === statusFilter;
-
     const query = searchQuery.toLowerCase();
     const matchesSearch = 
       truck.truckId.toLowerCase().includes(query) || 
       truck.route.from.toLowerCase().includes(query) || 
       truck.route.to.toLowerCase().includes(query);
-
     return matchesStatus && matchesSearch;
   });
 
@@ -80,35 +113,34 @@ const TruckDashboard = () => {
   };
 
   const handleStatusChange = async (newStatus) => {
-  if (!selectedTruck) return;
-  try {
-    await axios.post('http://localhost:5000/update-truck-status', {
-      tid: selectedTruck.truckId,
-      sid: selectedTruck.assignedShipment, 
-      status: newStatus
-    });
+    if (!selectedTruck) return;
+    try {
+        await axios.post('http://localhost:5000/update-truck-status', {
+        tid: selectedTruck.truckId,
+        sid: selectedTruck.assignedShipment, 
+        status: newStatus
+        });
 
-    // Update local state
-    setTrucks(trucks.map(t => 
-      t.truckId === selectedTruck.truckId 
-        ? { ...t, status: newStatus === "Delivered" ? "Available" : "In Use" } 
-        : t
-    ));
+        setTrucks(trucks.map(t => 
+        t.truckId === selectedTruck.truckId 
+            ? { ...t, status: newStatus === "Delivered" ? "Available" : "In Use" } 
+            : t
+        ));
 
-    // Set Dynamic Success Message
-    setSuccessMessage({
-      title: "Status Updated!",
-      sub: `Truck ${selectedTruck.truckId} is now ${newStatus}`
-    });
-    
-    setIsStatusDialogOpen(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 2000);
-  } catch (err) {
-    console.error(err);
-    alert("Update failed.");
-  }
-};
+        setSuccessMessage({
+        title: "Status Updated!",
+        sub: `Truck ${selectedTruck.truckId} is now ${newStatus}`
+        });
+        
+        setIsStatusDialogOpen(false);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+    } catch (err) {
+        console.error(err);
+        alert("Update failed.");
+    }
+  };
+
   return (
     <div className="dashboard-wrapper">
       <Navbar  username={username}/>
@@ -123,26 +155,16 @@ const TruckDashboard = () => {
               <div className="input-row">
                 <div className="input-field">
                   <label>Weight (KG)</label>
-                  <input 
-                    type="number" value={formData.weight} 
-                    onChange={(e) => setFormData({...formData, weight: e.target.value})} 
-                    placeholder="3000" 
-                  />
+                  <input type="number" value={formData.weight} onChange={(e) => setFormData({...formData, weight: e.target.value})} placeholder="3000" />
                 </div>
                 <div className="input-field">
                   <label>Volume (M<sup>3</sup>)</label>
-                  <input 
-                    type="number"  value= {formData.volume}
-                    onChange={(e) =>setFormData({...formData, volume: e.target.value})} placeholder="20" 
-                  />
+                  <input type="number"  value= {formData.volume} onChange={(e) =>setFormData({...formData, volume: e.target.value})} placeholder="20" />
                 </div>
               </div>
-              <div 
-                className="input-field" 
-              >
+              <div className="input-field">
                 <label>Vehicle Type</label>
-                <select value={formData.type}
-                onChange={(e) => setFormData({...formData, type : e.target.value})}>
+                <select value={formData.type} onChange={(e) => setFormData({...formData, type : e.target.value})}>
                   <option>Box Truck</option>
                   <option>Refrigerated</option>
                   <option>Flatbed</option>
@@ -151,19 +173,16 @@ const TruckDashboard = () => {
               <div className="input-field2">
                 <div className="input-field">
                   <label>From</label>
-                  <input type="string" value={formData.from}
-                onChange={(e) => setFormData({...formData, from : e.target.value})}placeholder="e.g. Hyderabad" />
+                  <input type="string" value={formData.from} onChange={(e) => setFormData({...formData, from : e.target.value})}placeholder="e.g. Hyderabad" />
                 </div>
                  <div className="input-field">
                   <label>To</label>
-                  <input type="String" value={formData.to}
-                onChange={(e) => setFormData({...formData, to : e.target.value})}placeholder="e.g. Chennai" />
+                  <input type="String" value={formData.to} onChange={(e) => setFormData({...formData, to : e.target.value})}placeholder="e.g. Chennai" />
                 </div>
               </div>
               <div className="input-field">
                 <label>Price per KM (₹)</label>
-                <input type="number" value={formData.price}
-                onChange={(e) => setFormData({...formData, price : e.target.value})} placeholder="30" />
+                <input type="number" value={formData.price} onChange={(e) => setFormData({...formData, price : e.target.value})} placeholder="30" />
               </div>
               <button className="submit-btn" onClick={handleRegister}>
                 <Plus size={20} /> Register Truck
@@ -213,11 +232,34 @@ const TruckDashboard = () => {
                       </div>
                     </div>
 
-                    {truck.status === 'In Use' ? 
-                      <button className="update-status-btn" onClick={() => handleStatusUpdate(truck)}>
-                        Update Status
-                      </button>
-                    :<></>}
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                        {truck.status === 'Available' && (
+                            <>
+                                <button 
+                                    onClick={() => openEditModal(truck)}
+                                    className="icon-btn-edit" 
+                                    style={{ background: '#f3f4f6', border: 'none', padding: '8px', borderRadius: '6px', cursor: 'pointer', color: '#4b5563' }}
+                                    title="Edit Truck"
+                                >
+                                    <Edit size={16} />
+                                </button>
+                                <button 
+                                    onClick={() => handleDelete(truck.truckId)}
+                                    className="icon-btn-delete"
+                                    style={{ background: '#fee2e2', border: 'none', padding: '8px', borderRadius: '6px', cursor: 'pointer', color: '#ef4444' }}
+                                    title="Delete Truck"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </>
+                        )}
+                        
+                        {truck.status === 'In Use' && (
+                            <button className="update-status-btn" onClick={() => handleStatusUpdate(truck)}>
+                                Update Status
+                            </button>
+                        )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -226,9 +268,85 @@ const TruckDashboard = () => {
           </div>
         </section>
       </main>
+
+      {/* --- EDIT MODAL (Click Outside to Close) --- */}
+      {isEditModalOpen && (
+        <div 
+            className="modal-overlay blur-bg" 
+            onClick={() => setIsEditModalOpen(false)} // CLOSE ON CLICK OUTSIDE
+        >
+          <div 
+            className="glass-card status-dialog" 
+            style={{ width: '350px' }}
+            onClick={(e) => e.stopPropagation()} // PREVENT CLOSE ON CLICK INSIDE
+          >
+            <h3 style={{ marginBottom: '15px' }}>Edit Truck</h3>
+            
+            <div className="form-body" style={{ padding: 0 }}>
+               
+               <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                   <div className="input-field" style={{ flex: 1 }}>
+                      <label>Weight (KG)</label>
+                      <input 
+                        type="number" 
+                        value={editingTruck.capacityWeight} 
+                        onChange={(e) => setEditingTruck({...editingTruck, capacityWeight: e.target.value})}
+                      />
+                   </div>
+                   <div className="input-field" style={{ flex: 1 }}>
+                      <label>Volume (m³)</label>
+                      <input 
+                        type="number" 
+                        value={editingTruck.capacityVolume} 
+                        onChange={(e) => setEditingTruck({...editingTruck, capacityVolume: e.target.value})}
+                      />
+                   </div>
+               </div>
+
+               <div className="input-field" style={{ marginBottom: '10px' }}>
+                  <label>Price per KM (₹)</label>
+                  <input 
+                    type="number" 
+                    value={editingTruck.pricePerKm} 
+                    onChange={(e) => setEditingTruck({...editingTruck, pricePerKm: e.target.value})}
+                  />
+               </div>
+               <div className="input-field" style={{ marginBottom: '10px' }}>
+                  <label>Route From</label>
+                  <input 
+                    type="text" 
+                    value={editingTruck.route.from} 
+                    onChange={(e) => setEditingTruck({...editingTruck, route: {...editingTruck.route, from: e.target.value}})}
+                  />
+               </div>
+               <div className="input-field" style={{ marginBottom: '10px' }}>
+                  <label>Route To</label>
+                  <input 
+                    type="text" 
+                    value={editingTruck.route.to} 
+                    onChange={(e) => setEditingTruck({...editingTruck, route: {...editingTruck.route, to: e.target.value}})}
+                  />
+               </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <button className="submit-btn" onClick={handleSaveEdit}>Save Changes</button>
+                <button className="close-btn" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- STATUS MODAL (Click Outside to Close) --- */}
       {isStatusDialogOpen && (
-        <div className="modal-overlay blur-bg">
-          <div className="glass-card status-dialog">
+        <div 
+            className="modal-overlay blur-bg"
+            onClick={() => setIsStatusDialogOpen(false)} // CLOSE ON CLICK OUTSIDE
+        >
+          <div 
+            className="glass-card status-dialog"
+            onClick={(e) => e.stopPropagation()} // PREVENT CLOSE ON CLICK INSIDE
+          >
             <h3>Update Delivery Status</h3>
             <p>Current: <strong>{selectedTruck?.status}</strong></p>
             
@@ -250,6 +368,7 @@ const TruckDashboard = () => {
           </div>
         </div>
       )}
+      
       {showSuccess && (
         <div className="modal-overlay blur-bg intense">
           <div className="verification-box glass-card feedback-popup">
