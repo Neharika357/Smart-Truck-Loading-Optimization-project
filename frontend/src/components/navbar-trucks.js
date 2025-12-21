@@ -102,7 +102,7 @@ const Navbar = ({username})=> {
         <>
             <nav className="glass-nav">
                 <div className="nav-container">
-                <div className="nav-brand">
+                <div className="nav-brand" onClick={() => navigate(`/dealer/${username}`)} style={{cursor: 'pointer'}}>
                     <div className="logo-icon"><Truck size={24} color="white" /></div>
                     <span>SmartTruck <small>Optimizer</small></span>
                 </div>

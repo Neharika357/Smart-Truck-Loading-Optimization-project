@@ -70,11 +70,20 @@ const Navbar = ({username}) => {
         return () => clearInterval(interval);
     }, []);
 
+    const handleBrandClick = () => {
+        if (username) {
+            navigate(`/warehouse/${username}`);
+        } else {
+            console.error("Username is missing, cannot navigate");
+            // Optionally redirect to login or home
+        }
+    };
+
     return (
         <nav className="glass-nav">
             <div className="nav-container">
                 
-                <div className="nav-brand" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
+                <div className="nav-brand" onClick={() =>handleBrandClick()} style={{cursor: 'pointer'}}>
                     <div className="logo-icon"><Truck size={24} color="white" /></div>
                     <span>SmartTruck <small>Optimizer</small></span>
                 </div>
