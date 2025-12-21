@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { FaTruck, FaHourglassHalf, FaWeightHanging, FaBox, FaEdit, FaTrash } from 'react-icons/fa'; // Added Icons
+import { FaTruck, FaHourglassHalf, FaWeightHanging, FaBox, FaEdit, FaTrash } from 'react-icons/fa'; 
 import { Search } from 'lucide-react';
-import axios from 'axios'; // Added Axios
+import axios from 'axios'; 
 import '../styles/shipments.css'; 
 
 const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus }) => {
@@ -14,7 +14,7 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
     if (!window.confirm("Are you sure? This will delete the shipment and cancel any requests.")) return;
     try {
       await axios.delete(`http://localhost:5000/delete-shipment/${sid}`);
-      window.location.reload(); // Refresh to show changes
+      window.location.reload(); 
     } catch (err) {
       alert("Failed to delete shipment");
       console.error(err);
@@ -23,7 +23,7 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
 
   // --- EDIT FUNCTIONS ---
   const openEdit = (shipment) => {
-    setEditData({ ...shipment }); // Copy data to avoid direct mutation
+    setEditData({ ...shipment }); 
     setIsEditOpen(true);
   };
 
@@ -31,7 +31,7 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
     try {
       await axios.put(`http://localhost:5000/update-shipment/${editData.sid}`, editData);
       setIsEditOpen(false);
-      window.location.reload(); // Refresh list
+      window.location.reload(); 
     } catch (err) {
       alert("Failed to update shipment");
       console.error(err);
@@ -146,14 +146,23 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
         )}
       </div>
 
-      {/* --- EDIT MODAL --- */}
+      {/* --- EDIT MODAL (Click Outside to Close) --- */}
       {isEditOpen && editData && (
-        <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
-            display: 'flex', justifyContent: 'center', alignItems: 'center'
-        }}>
-            <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', width: '350px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
+        <div 
+            style={{
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
+                display: 'flex', justifyContent: 'center', alignItems: 'center'
+            }}
+            onClick={() => setIsEditOpen(false)} // CLOSE ON CLICK OUTSIDE
+        >
+            <div 
+                style={{ 
+                    backgroundColor: 'white', padding: '25px', borderRadius: '12px', width: '350px', 
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.2)' 
+                }}
+                onClick={(e) => e.stopPropagation()} // PREVENT CLOSE ON CLICK INSIDE
+            >
                 <h3 style={{ margin: '0 0 15px 0', color: '#111827' }}>Edit Shipment</h3>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
