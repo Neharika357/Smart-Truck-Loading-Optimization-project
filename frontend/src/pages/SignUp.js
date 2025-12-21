@@ -15,7 +15,7 @@ const register = async (userData) => {
   // Remove frontend-only field
   delete payload.serviceArea;
 
-  const response = await fetch(`${API_URL}/register`, {
+  const response = await fetch(`http://localhost:5000/api/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -71,8 +71,6 @@ function PrimaryButton({ children, loading, disabled, type = 'button', className
     </button>
   );
 }
-
-/* ---------------- VALIDATION SCHEMAS ---------------- */
 
 const step2Schema = z.object({
   fullName: z.string().min(2, 'Full name required'),
