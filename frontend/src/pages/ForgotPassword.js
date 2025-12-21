@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
-import TextInput from '../components/ui/TextInput';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),

@@ -6,6 +6,7 @@ var ShipmentInfo = require('./models/ShipmentInfo.js')
 var ShipmentOrder = require('./models/OrdersShipment.js')
 var TruckOrder = require('./models/OrdersTrucks.js')
 var AcceptedOrder = require('./models/AcceptedOrders.js');
+const authRoutes = require('./auth.js')
 const cors = require('cors');
 const mongoose = require('mongoose');
 
@@ -20,6 +21,8 @@ var url = "mongodb+srv://clpro_123:Pramodha123@cluster0.k9kjmxq.mongodb.net/Smar
 mongoose.connect(url)
 .then((res)=> console.log('Connected to db'))
 .catch((err) => console.log(err));
+
+app.use('/api/auth', authRoutes);
 
 app.post('/create-truck', async (req, res) => {
     try {

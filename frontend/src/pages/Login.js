@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
-import { login } from '../services/authService';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
