@@ -346,6 +346,28 @@ app.get('/accepted-orders/:role/:username', async (req, res) => {
     }
 });
 
+app.get('/truckdealer/:username', async(req, res) =>{
+    try{
+         const truckdealer = await TruckDealer.find({username: req.params.username});
+         if (!truckdealer) return res.status(404).json({ error: "Truckdealer not found" });
+         res.status(200).json(truckdealer);
+    }catch (err) {
+        res.status(500).json({ error: "Error fetching truckdealer details" });
+    }
+   
+})
+
+app.get('/user/:username', async(req, res) =>{
+    try{
+         const user = await WarehouseUser.find({username: req.params.username});
+         if (!user) return res.status(404).json({ error: "Warehouse user not found" });
+         res.status(200).json(user);
+    }catch (err) {
+        res.status(500).json({ error: "Error fetching Warehouse User details" });
+    }
+   
+})
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);

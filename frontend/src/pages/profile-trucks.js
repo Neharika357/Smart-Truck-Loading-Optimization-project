@@ -29,6 +29,9 @@ const Profile = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
+        const dealerRes = await axios.get(`http://localhost:5000/truckdealer/${CURRENT_USER}`);
+        const dealerData = dealerRes.data[0];
+
         const truckRes = await axios.get(`http://localhost:5000/truck?username=${CURRENT_USER}`);
         const trucks = truckRes.data;
 
@@ -49,7 +52,7 @@ const Profile = () => {
 
         setDealerInfo({
           name: CURRENT_USER,
-          email: `${CURRENT_USER.toLowerCase()}@smarttruck.com`,
+          email: dealerData?.email || "No email provided",
           location: trucks.length > 0 ? trucks[0].route.from : "Remote",
           totalTrucks: trucks.length,
           available: trucks.filter(t => t.status === "Available").length,
@@ -106,7 +109,6 @@ const Profile = () => {
               <h1>{dealerInfo.name}</h1>
               <div className="hero-badges">
                 <span className="badge-item"><Mail size={14} /> {dealerInfo.email}</span>
-                <span className="badge-item"><MapPin size={14} /> {dealerInfo.location}</span>
               </div>
             </div>
           </div>
