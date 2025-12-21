@@ -65,7 +65,7 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
                 </div>
                 <div style={styles.statItem}>
                   <FaRoute color="gray"/> 
-                  <span>{truck.utilization}</span>
+                  <span>{truck.utilization}% Capacity Used</span>
                 </div>
               </div>
 
