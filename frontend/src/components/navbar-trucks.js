@@ -70,13 +70,13 @@ const Navbar = ({username})=> {
         }
     };
 
-    const handleDeleteOrder = async (sid, tid) => {
+    const handleDeleteOrder = async (sid, tid, status) => {
         const confirmDelete = window.confirm(`Are you sure you want to clear the record for Shipment ${sid}?`);
         if (!confirmDelete) return;
 
         try {
             const res = await axios.delete(`http://localhost:5000/delete-dealer-order-request`, {
-                data: { sid, tid } 
+                data: { sid, tid , status} 
             });
 
             if (res.status === 200) {
@@ -153,7 +153,7 @@ const Navbar = ({username})=> {
                                                 {n.status === "Delivered" && (
                                                     <button 
                                                         className="delete-trigger" 
-                                                        onClick={() => handleDeleteOrder(n.sid, n.tid)}
+                                                        onClick={() => handleDeleteOrder(n.sid, n.tid, n.status)}
                                                         title="Clear Record"
                                                     >
                                                         <Trash2 size={14} />
