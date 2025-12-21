@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Warehouse, Package, TrendingUp, Clock, History, 
-  ChevronRight, ExternalLink, MapPin, Box, Mail, 
-  X, Weight, Ruler, Calendar, Truck 
+  ChevronRight, ExternalLink, Box, Mail, 
+  X, Truck 
 } from 'lucide-react';
 import '../styles/profile-warehouse.css'; 
 import Navbar from '../components/navbar-shipment';

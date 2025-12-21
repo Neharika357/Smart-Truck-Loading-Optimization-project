@@ -1,9 +1,24 @@
 import React from 'react';
 import { FaTruck, FaHourglassHalf, FaWeightHanging, FaBox } from 'react-icons/fa';
+import { useState } from 'react';
 import { Search } from 'lucide-react';
 import '../styles/shipments.css'; 
 
 const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredShipments = shipments.filter((s) => {
+    const matchesStatus = filterStatus === 'All' || s.status === filterStatus;
+
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch = 
+      s.id.toString().toLowerCase().includes(searchLower) ||
+      s.origin.toLowerCase().includes(searchLower) ||
+      s.destination.toLowerCase().includes(searchLower);
+
+    return matchesStatus && matchesSearch;
+  });
+
   return (
     <div className="fleet-box">
       {/* HEADER */}
@@ -17,7 +32,8 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
 
         <div className="search-box">
            <Search size={18} />
-           <input type="text" placeholder="Search ID or Route..." />
+           <input type="text" placeholder="Search ID or Route..."  value={searchQuery} 
+             onChange={(e) => setSearchQuery(e.target.value)}/>
         </div>
       </div>
 
@@ -39,7 +55,7 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
               <p>No shipments found.</p>
            </div>
         ) : (
-          shipments.map((s) => (
+          filteredShipments.map((s) => (
             <div key={s.id} className="shipment-card">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 
