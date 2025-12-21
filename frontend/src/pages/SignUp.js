@@ -124,78 +124,69 @@ function Signup() {
     }
   };
 
-  const handleNextStep = (e) => {
-    e.preventDefault();
-    setErrors({});
-    try {
-      step2Schema.parse(formData);
-      setStep(3);
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const fieldErrors = {};
-        err.errors.forEach((e) => (fieldErrors[e.path[0]] = e.message));
-        setErrors(fieldErrors);
-      }
-    }
-  };
+const handleNextStep = (e) => {
+  e.preventDefault();
+  setErrors({});
+  setApiError('');
+
+  const result = step2Schema.safeParse(formData);
+
+  if (!result.success) {
+    const fieldErrors = {};
+    
+    result.error.issues.forEach((issue) => {
+      fieldErrors[issue.path[0]] = issue.message;
+    });
+
+    setErrors(fieldErrors);
+    return; 
+  }
+  setStep(3);
+};
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setApiError('');
+  e.preventDefault();
+  setErrors({});
+  setApiError('');
 
-    try {
-      const basePayload = {
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
-      };
+  // 1. Validate the specific schema based on role
+  const schema = formData.role === 'warehouse' ? warehouseSchema : dealerSchema;
+  const result = schema.safeParse(formData);
 
-      let payload;
+  if (!result.success) {
+    const fieldErrors = {};
+    result.error.issues.forEach((issue) => {
+      fieldErrors[issue.path[0]] = issue.message;
+    });
+    setErrors(fieldErrors);
+    return; // Stop here if validation fails
+  }
 
-      if (formData.role === 'warehouse') {
-        warehouseSchema.parse(formData);
-        payload = {
-          ...basePayload,
-          companyName: formData.companyName,
-          managerName: formData.managerName,
-          location: formData.location,
-        };
-      } else {
-        dealerSchema.parse(formData);
-        payload = {
-          ...basePayload,
-          companyName: formData.companyName,
-          contactNumber: formData.contactNumber,
-          serviceArea: formData.serviceArea,
-        };
-      }
-
-      setLoading(true);
-      const response = await register(payload);
-
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('role', formData.role);
-
-      navigate(
-        formData.role === 'warehouse'
-          ? '/warehouse/dashboard'
-          : '/dealer/dashboard'
-      );
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const fieldErrors = {};
-        err.errors.forEach((e) => (fieldErrors[e.path[0]] = e.message));
-        setErrors(fieldErrors);
-      } else {
-        setApiError(err.message || 'Signup failed');
-      }
-    } finally {
-      setLoading(false);
-    }
+  // 2. Prepare Payload
+  const payload = {
+    fullName: formData.fullName,
+    email: formData.email,
+    password: formData.password,
+    role: formData.role,
+    companyName: formData.companyName,
+    ...(formData.role === 'warehouse' 
+      ? { managerName: formData.managerName, location: formData.location }
+      : { contactNumber: formData.contactNumber, serviceArea: formData.serviceArea }
+    )
   };
 
+  try {
+    setLoading(true);
+    const response = await register(payload);
+    localStorage.setItem('authToken', response.token);
+    localStorage.setItem('role', formData.role);
+    navigate(formData.role === 'warehouse' ? '/warehouse/dashboard' : '/dealer/dashboard');
+  } catch (err) {
+    setApiError(err.message || 'Signup failed');
+  } finally {
+    setLoading(false);
+  }
+};
   /* ---------------- UI STEPS ---------------- */
 
   const renderStep1 = () => (
