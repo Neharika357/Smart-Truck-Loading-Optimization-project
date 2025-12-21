@@ -6,14 +6,8 @@ const register = async (userData) => {
   // 🔥 IMPORTANT FIX:
   // Convert single serviceArea string → array for backend
   const payload = {
-    ...userData,
-    serviceAreas: userData.serviceArea
-      ? [userData.serviceArea]
-      : undefined,
-  };
-
-  // Remove frontend-only field
-  delete payload.serviceArea;
+      ...userData
+    };
 
   const response = await fetch(`http://localhost:5000/api/auth/register`, {
     method: 'POST',
