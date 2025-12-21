@@ -11,6 +11,7 @@ const TruckDashboard = () => {
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [selectedTruck, setSelectedTruck] = useState(null);
   const [successMessage, setSuccessMessage] = useState({ title: "", sub: "" });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [formData, setFormData] = useState({
     weight: '',
@@ -61,9 +62,17 @@ const TruckDashboard = () => {
     }
   };
 
-  const filteredTrucks = trucks.filter(truck => 
-    statusFilter === 'All' ? true : truck.status === statusFilter
-  );
+  const filteredTrucks = trucks.filter(truck => {
+    const matchesStatus = statusFilter === 'All' ? true : truck.status === statusFilter;
+
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+      truck.truckId.toLowerCase().includes(query) || 
+      truck.route.from.toLowerCase().includes(query) || 
+      truck.route.to.toLowerCase().includes(query);
+
+    return matchesStatus && matchesSearch;
+  });
 
   const handleStatusUpdate = (truck) => {
     setSelectedTruck(truck);
@@ -169,7 +178,7 @@ const TruckDashboard = () => {
               <h3>Active Fleet</h3>
               <div className="search-box">
                 <Search size={18} />
-                <input type="text" placeholder="Search ID or Route..." />
+                <input type="text" placeholder="Search ID or Route..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
               </div>
             </div>
             <div className="filter-tabs">

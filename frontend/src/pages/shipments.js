@@ -131,6 +131,7 @@ const WarehouseDashboard = () => {
   };
 
   const filteredShipments = shipments.filter(shipment => {
+    if (shipment.status === 'Delivered') return false;
     if (filterStatus === 'All') return true;
     return shipment.status === filterStatus;
   });
