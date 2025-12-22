@@ -27,23 +27,34 @@ const register = async (userData) => {
   return data;
 };
 
-function TextInput({ label, id, type = 'text', value, onChange, placeholder, error }) {
+function StepIndicator({ currentStep }) {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
+    <div className="step-indicator-container">
+      {[1, 2, 3].map((s) => (
+        <div key={s} className="step-wrapper">
+          <div className={`step-number ${currentStep >= s ? 'active' : ''}`}>
+            {s}
+          </div>
+          {s < 3 && <div className={`step-line ${currentStep > s ? 'active' : ''}`} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TextInput({ label, id, type = 'text', value, onChange, placeholder, error }) {
+ return (
+    <div className="input2-group">
+      <label htmlFor={id} className="input2-label">{label}</label>
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 border rounded-lg outline-none transition-all focus:ring-2 focus:border-green-500 focus:ring-green-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        className={`input2-field ${error ? 'input2-error' : ''}`}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </div>
   );
 }
@@ -56,12 +67,10 @@ function PrimaryButton({ children, loading, disabled, type = 'button', className
     <button
       type={type}
       disabled={isDisabled}
-      className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`btn-primary-custom ${className}`}
       {...rest}
     >
-      {loading && (
-        <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      )}
+      {loading && <span className="spinner-icon" />}
       {children}
     </button>
   );
@@ -184,100 +193,78 @@ const handleNextStep = (e) => {
 };
   /* ---------------- UI STEPS ---------------- */
 
-  const renderStep1 = () => (
-    <div className="space-y-10">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-800">Choose Your Role</h2>
-        <p className="text-gray-500 mt-2">
-          Select how you want to use SmartLoad Logistics
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        <button
-          type="button"
-          onClick={() => {
-            setFormData({ ...formData, role: 'warehouse' });
-            setStep(2);
-          }}
-          className="border-2 rounded-2xl p-8 text-left bg-white hover:border-green-600 hover:shadow-xl transition-all"
-        >
-          <div className="text-2xl mb-3">🏬</div>
-          <h3 className="text-xl font-semibold">Warehouse Manager</h3>
-          <p className="text-gray-500 mt-2">
-            Manage shipments and book trucks easily.
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setFormData({ ...formData, role: 'dealer' });
-            setStep(2);
-          }}
-          className="border-2 rounded-2xl p-8 text-left bg-white hover:border-green-600 hover:shadow-xl transition-all"
-        >
-          <div className="text-2xl mb-3">🚚</div>
-          <h3 className="text-xl font-semibold">Truck Dealer</h3>
-          <p className="text-gray-500 mt-2">
-            Find freight loads and grow your business.
-          </p>
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderStep2 = () => (
-    <div className="space-y-4">
-      <TextInput id="fullName" label="Full Name" value={formData.fullName} onChange={handleChange} error={errors.fullName} />
-      <TextInput id="email" label="Email" value={formData.email} onChange={handleChange} error={errors.email} />
-      <TextInput id="password" label="Password" type="password" value={formData.password} onChange={handleChange} error={errors.password} />
-      <TextInput id="confirmPassword" label="Confirm Password" type="password" value={formData.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
-
-      <PrimaryButton type="button" onClick={handleNextStep}>
-        Next
-      </PrimaryButton>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="space-y-4">
-      <TextInput id="companyName" label="Company Name" value={formData.companyName} onChange={handleChange} error={errors.companyName} />
-
-      {formData.role === 'warehouse' ? (
-        <>
-          <TextInput id="managerName" label="Manager Name" value={formData.managerName} onChange={handleChange} error={errors.managerName} />
-          <TextInput id="location" label="Location" value={formData.location} onChange={handleChange} error={errors.location} />
-        </>
-      ) : (
-        <>
-          <TextInput id="contactNumber" label="Contact Number" value={formData.contactNumber} onChange={handleChange} error={errors.contactNumber} />
-          <TextInput id="serviceArea" label="Service Area" value={formData.serviceArea} onChange={handleChange} error={errors.serviceArea} />
-        </>
-      )}
-
-      <PrimaryButton type="submit" loading={loading}>
-        Complete Signup
-      </PrimaryButton>
-    </div>
-  );
+  
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto">
-      {apiError && <p className="text-red-600 mb-4">{apiError}</p>}
-      {step === 1 && renderStep1()}
-      {step === 2 && renderStep2()}
-      {step === 3 && renderStep3()}
+    <div className="auth-page">
+      <div className="signup-container">
+        {/* Global Heading */}
+        <div className="auth-header">
+          <h1 className="system-title">Smart Truck Loading Optimization System</h1>
+          <p className="system-subtitle">Connect warehouses and truck dealers for efficient logistics</p>
+        </div>
 
-      {step === 1 && (
-        <p className="text-center mt-6">
-          Already have an account?{' '}
-          <Link to="/login" className="text-green-600 font-bold">
-            Login
-          </Link>
-        </p>
-      )}
-    </form>
+        <div className="auth-card">
+          <StepIndicator currentStep={step} />
+
+          {apiError && <div className="api-error-alert">{apiError}</div>}
+
+          {step === 1 && (
+            <div className="step-content">
+              <h2 className="step-title">Select Your Role</h2>
+              <div className="role-grid">
+                <button type="button" onClick={() => { setFormData({ ...formData, role: 'warehouse' }); setStep(2); }} className="role-card">
+                  <div className="role-icon">🏬</div>
+                  <h3 className="role-name">Warehouse User</h3>
+                  <p className="role-desc">Upload shipments and get optimized truck matches.</p>
+                </button>
+                <button type="button" onClick={() => { setFormData({ ...formData, role: 'dealer' }); setStep(2); }} className="role-card">
+                  <div className="role-icon">🚚</div>
+                  <h3 className="role-name">Truck Dealer</h3>
+                  <p className="role-desc">Register trucks and accept booking requests.</p>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="auth-form-spacing">
+              <h2 className="step-title">Personal Details</h2>
+              <TextInput id="fullName" label="Full Name" value={formData.fullName} onChange={handleChange} error={errors.fullName} />
+              <TextInput id="email" label="Email" value={formData.email} onChange={handleChange} error={errors.email} />
+              <TextInput id="password" label="Password" type="password" value={formData.password} onChange={handleChange} error={errors.password} />
+              <TextInput id="confirmPassword" label="Confirm Password" type="password" value={formData.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
+              <PrimaryButton type="button" onClick={handleNextStep}>Next</PrimaryButton>
+            </div>
+          )}
+
+          {step === 3 && (
+            <form onSubmit={handleSubmit} className="auth-form-spacing">
+              <h2 className="step-title">Business Details</h2>
+              <TextInput id="companyName" label="Company Name" value={formData.companyName} onChange={handleChange} error={errors.companyName} />
+              {formData.role === 'warehouse' ? (
+                <>
+                  <TextInput id="managerName" label="Manager Name" value={formData.managerName} onChange={handleChange} error={errors.managerName} />
+                  <TextInput id="location" label="Location" value={formData.location} onChange={handleChange} error={errors.location} />
+                </>
+              ) : (
+                <>
+                  <TextInput id="contactNumber" label="Contact Number" value={formData.contactNumber} onChange={handleChange} error={errors.contactNumber} />
+                  <TextInput id="serviceArea" label="Service Area" value={formData.serviceArea} onChange={handleChange} error={errors.serviceArea} />
+                </>
+              )}
+              <PrimaryButton type="submit" loading={loading}>Complete Signup</PrimaryButton>
+            </form>
+          )}
+
+          {step === 1 && (
+            <div className="auth-footer">
+              Already have an account? <Link to="/login" className="link-bold">Login</Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

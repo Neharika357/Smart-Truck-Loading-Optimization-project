@@ -5,21 +5,17 @@ import '../styles/auth.css'
 
 function TextInput({ label, id, type = 'text', value, onChange, placeholder, error }) {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
+    <div className="input2-group">
+      <label htmlFor={id} className="input2-label">{label}</label>
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 border rounded-lg outline-none transition-all focus:ring-2 focus:border-green-500 focus:ring-green-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        className={`input2-field ${error ? 'input2-error' : ''}`}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </div>
   );
 }
@@ -31,12 +27,10 @@ function PrimaryButton({ children, loading, disabled, type = 'button', className
     <button
       type={type}
       disabled={isDisabled}
-      className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`btn-primary-custom ${className}`}
       {...rest}
     >
-      {loading && (
-        <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      )}
+      {loading && <span className="spinner-icon" />}
       {children}
     </button>
   );
@@ -121,21 +115,21 @@ function ResetPassword() {
     }
   };
 
-  if (success) {
+ if (success) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center border-t-4 border-green-500">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-              <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-card success-card">
+            <div className="success-icon-wrapper">
+              <svg className="success-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Password Reset Successful</h3>
-            <p className="text-sm text-gray-500 mb-6">
+            <h3 className="success-title">Password Reset Successful</h3>
+            <p className="auth-subtitle">
               Your password has been updated. Redirecting to login page...
             </p>
-            <Link to="/auth/login">
+            <Link to="/auth/login" className="full-link">
               <PrimaryButton type="button">Go to Login Now</PrimaryButton>
             </Link>
           </div>
@@ -145,36 +139,24 @@ function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
-          Reset Password
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
-          Set a new password for your account
-        </p>
+    <div className="auth-page">
+      <div className="auth-header">
+        <h2 className="auth-title">Reset Password</h2>
+        <p className="auth-subtitle">Set a new password for your account</p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {apiError && (
-            <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-md px-3 py-2">
-              {apiError}
-            </div>
-          )}
+      <div className="auth-container">
+        <div className="auth-card">
+          {apiError && <div className="api-error-alert">{apiError}</div>}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Allow manual token entry if not in URL */}
+          <form onSubmit={handleSubmit} className="auth-form-spacing">
             <TextInput
               id="token"
               label="Reset Token"
-              type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="Paste token here"
               error={errors.token}
-              // Optional: Disable if token came from URL to prevent editing
-              // disabled={!!searchParams.get('token')} 
             />
 
             <TextInput
@@ -202,8 +184,8 @@ function ResetPassword() {
             </PrimaryButton>
           </form>
 
-          <div className="mt-6 text-center">
-            <Link to="/auth/login" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+          <div className="back-to-login">
+            <Link to="/auth/login" className="link-primary">
               Cancel and return to Login
             </Link>
           </div>

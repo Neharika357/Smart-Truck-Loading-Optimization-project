@@ -14,12 +14,10 @@ function PrimaryButton({ children, loading, disabled, type = 'button', className
     <button
       type={type}
       disabled={isDisabled}
-      className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`btn-primary-custom ${className}`}
       {...rest}
     >
-      {loading && (
-        <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      )}
+      {loading && <span className="spinner-icon" />}
       {children}
     </button>
   );
@@ -35,21 +33,17 @@ function TextInput({
   error,
 }) {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
+    <div className="input2-group">
+      <label htmlFor={id} className="input2-label">{label}</label>
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 border rounded-lg outline-none transition-all focus:ring-2 focus:border-green-500 focus:ring-green-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        className={`input2-field ${error ? 'input2-error' : ''}`}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </div>
   );
 }
@@ -91,25 +85,25 @@ function ForgotPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border-t-4 border-green-500 text-center">
-            <h3 className="text-lg font-bold text-green-800 mb-2">Check your Email</h3>
-            <p className="text-sm text-gray-600 mb-6">
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-card success-card">
+            <h3 className="success-title">Check your Email</h3>
+            <p className="auth-subtitle">
               We have sent a password reset link to <strong>{email}</strong>.
             </p>
             
-            <div className="p-3 bg-gray-100 rounded mb-4 text-xs text-gray-500 text-left">
+            <div className="demo-note">
               <strong>Note:</strong> Since this is a demo, no real email was sent. 
               You can click the link below to simulate the reset page.
             </div>
 
-            <Link to="/auth/reset-password?token=demo-token-123">
+            <Link to="/auth/reset-password?token=demo-token-123" className="full-link">
               <PrimaryButton type="button">Go to Reset Password</PrimaryButton>
             </Link>
             
-            <div className="mt-4">
-              <Link to="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 underline">
+            <div className="back-to-login">
+              <Link to="/auth/login" className="link-secondary">
                 Back to Login
               </Link>
             </div>
@@ -120,19 +114,15 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
-          Forgot Password
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
-          Enter your email to receive a reset token
-        </p>
+    <div className="auth-page">
+      <div className="auth-header">
+        <h2 className="auth-title">Forgot Password</h2>
+        <p className="auth-subtitle">Enter your email to receive a reset token</p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="auth-container">
+        <div className="auth-card">
+          <form onSubmit={handleSubmit} className="auth-form">
             <TextInput
               id="email"
               label="Email Address"
@@ -143,13 +133,13 @@ function ForgotPassword() {
               error={errors.email}
             />
 
-            <PrimaryButton type="submit" loading={loading}>
+            <PrimaryButton type="submit" loading={loading} className="mt-6">
               Send Reset Link
             </PrimaryButton>
           </form>
 
-          <div className="mt-6 text-center">
-            <Link to="/auth/login" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+          <div className="back-to-login">
+            <Link to="/auth/login" className="link-primary">
               Back to Login
             </Link>
           </div>
