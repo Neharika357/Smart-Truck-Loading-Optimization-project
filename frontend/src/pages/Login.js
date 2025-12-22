@@ -117,7 +117,7 @@ function Login() {
       <div className="auth-container">
         {/* Main System Heading */}
         <div className="auth-header">
-          <h1 className="system-title">Smart Truck Loading Optimization System</h1>
+          <h1 className="system-title">OptiTruckConnect</h1>
           <p className="system-subtitle">Connect warehouses and truck dealers for efficient logistics</p>
         </div>
 
