@@ -31,13 +31,13 @@ const Navbar = ({username}) => {
         }
     };
 
-    const handleDeleteOrder = async (sid, tid) => {
+    const handleDeleteOrder = async (sid, tid, status) => {
         const confirmDelete = window.confirm(`Are you sure you want to clear the record for Shipment ${sid}?`);
         if (!confirmDelete) return;
 
         try {
             const res = await axios.delete(`http://localhost:5000/delete-warehouse-order-request`, {
-                data: { sid, tid } 
+                data: { sid, tid, status } 
             });
 
             if (res.status === 200) {
@@ -119,7 +119,7 @@ const Navbar = ({username}) => {
                                                     {(n.status === "Accepted" || n.status === "Delivered") && (
                                                         <button 
                                                             className="delete-trigger-btn"
-                                                            onClick={() => handleDeleteOrder(n.sid, n.tid)}
+                                                            onClick={() => handleDeleteOrder(n.sid, n.tid, n.status)}
                                                             title="Dismiss"
                                                         >
                                                             <Trash2 size={14} />

@@ -339,6 +339,7 @@ app.post('/accept-order', async (req, res) => {
             { sid: sid, tid: tid },
             { status: "Accepted" }
         );
+        
 
         await TruckOrder.findOneAndUpdate(
             { sid: sid, tid: tid },
@@ -353,6 +354,14 @@ app.post('/accept-order', async (req, res) => {
             status: "Assigned" 
         });
         await newAcceptedOrder.save();
+
+        const newOrder = new ShipmentOrder({
+            sid:sid,
+            tid:tid,
+            warehouse: shipmentDoc.warehouseUser,
+            status:"Assigned"
+        });
+        await newOrder.save();
 
         res.status(200).json({ message: "Order Accepted and cross-references updated." });
 
@@ -465,55 +474,60 @@ app.get('/accepted-orders/:role/:username', async (req, res) => {
     }
 });
 
-app.delete('/delete-dealer-order-request', async (req, res) => {
-    try {
-        const { sid, tid } = req.body;
-
-        if (!sid || !tid) {
-            return res.status(400).json({ error: "Missing sid or tid for deletion" });
-        }
-
-        console.log(`🗑️ Deleting Request Tuples: S:${sid} | T:${tid}`);
-
-        const deletionResult = await TruckOrder.deleteMany({ sid: sid, tid: tid });
-
-        res.status(200).json({ 
-            message: "Order tuples deleted successfully", 
-            details: {
-                truckOrdersDeleted: deletionResult.deletedCount,
-            }
-        });
-
-    } catch (err) {
-        console.error("Error deleting order tuples:", err);
-        res.status(500).json({ error: "Failed to delete order records" });
-    }
-});
-
 app.delete('/delete-warehouse-order-request', async (req, res) => {
     try {
-        const { sid, tid } = req.body;
+        const { sid, tid, status } = req.body; // Added status here
 
-        if (!sid || !tid) {
-            return res.status(400).json({ error: "Missing sid or tid for deletion" });
+        if (!sid || !tid || !status) {
+            return res.status(400).json({ error: "Missing sid, tid, or status for deletion" });
         }
 
-        console.log(`🗑️ Deleting Request Tuples: S:${sid} | T:${tid}`);
+        console.log(`🗑️ Clearing Warehouse Record: S:${sid} | T:${tid} with Status: ${status}`);
 
-        const deletionResult = await ShipmentOrder.deleteMany({ sid: sid, tid: tid });
+        const deletionResult = await ShipmentOrder.deleteOne({ 
+            sid: sid, 
+            tid: tid, 
+            status: status 
+        });
 
         res.status(200).json({ 
-            message: "Order tuples deleted successfully", 
-            details: {
-                truckOrdersDeleted: deletionResult.deletedCount,
-            }
+            message: "Record cleared successfully", 
+            deletedCount: deletionResult.deletedCount
         });
 
     } catch (err) {
-        console.error("Error deleting order tuples:", err);
-        res.status(500).json({ error: "Failed to delete order records" });
+        console.error("Error deleting warehouse record:", err);
+        res.status(500).json({ error: "Failed to delete order record" });
     }
 });
+
+app.delete('/delete-dealer-order-request', async (req, res) => {
+    try {
+        const { sid, tid, status } = req.body; // Added status here
+
+        if (!sid || !tid || !status) {
+            return res.status(400).json({ error: "Missing sid, tid, or status for deletion" });
+        }
+
+        console.log(`🗑️ Clearing Dealer Record: S:${sid} | T:${tid} with Status: ${status}`);
+
+        const deletionResult = await TruckOrder.deleteOne({ 
+            sid: sid, 
+            tid: tid, 
+            status: status 
+        });
+
+        res.status(200).json({ 
+            message: "Record cleared successfully", 
+            deletedCount: deletionResult.deletedCount
+        });
+
+    } catch (err) {
+        console.error("Error deleting dealer record:", err);
+        res.status(500).json({ error: "Failed to delete order record" });
+    }
+});
+
 
 app.get('/truckdealer/:username', async(req, res) =>{
     try{
