@@ -108,8 +108,8 @@ const Navbar = ({username})=> {
                 </div>
                 
                 <div className="nav-actions">
-                    <button className="metric-badge eco"><Leaf size={16} />CO2 saved</button>
-                    <button className="metric-badge stats"><BarChart3 size={16} /> Analytics</button>
+                    {/* <button className="metric-badge eco"><Leaf size={16} />CO2 saved</button>
+                    <button className="metric-badge stats"><BarChart3 size={16} /> Analytics</button> */}
                     <div className="nav-divider"></div>
                     <div className="icon-group">
                     <div className="notif-wrapper" ref={notifRef}>
