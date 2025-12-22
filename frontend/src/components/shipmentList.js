@@ -5,11 +5,10 @@ import axios from 'axios';
 import '../styles/shipments.css'; 
 
 const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus }) => {
-  // --- STATE FOR EDITING ---
+
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
 
-  // --- DELETE FUNCTION ---
   const handleDelete = async (sid) => {
     if (!window.confirm("Are you sure? This will delete the shipment and cancel any requests.")) return;
     try {
@@ -21,7 +20,6 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
     }
   };
 
-  // --- EDIT FUNCTIONS ---
   const openEdit = (shipment) => {
     setEditData({ ...shipment }); 
     setIsEditOpen(true);
@@ -108,7 +106,6 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
                       Find Best Truck
                     </button>
                     
-                    {/* EDIT BUTTON */}
                     <button 
                         onClick={() => openEdit(s)}
                         style={{ background: '#f3f4f6', border: 'none', padding: '8px', borderRadius: '6px', cursor: 'pointer', color: '#4b5563' }}
@@ -117,7 +114,6 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
                         <FaEdit size={14} />
                     </button>
 
-                    {/* DELETE BUTTON */}
                     <button 
                         onClick={() => handleDelete(s.sid)}
                         style={{ background: '#fee2e2', border: 'none', padding: '8px', borderRadius: '6px', cursor: 'pointer', color: '#ef4444' }}
@@ -146,7 +142,6 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
         )}
       </div>
 
-      {/* --- EDIT MODAL (Click Outside to Close) --- */}
       {isEditOpen && editData && (
         <div 
             style={{
@@ -154,14 +149,14 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
                 backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
                 display: 'flex', justifyContent: 'center', alignItems: 'center'
             }}
-            onClick={() => setIsEditOpen(false)} // CLOSE ON CLICK OUTSIDE
+            onClick={() => setIsEditOpen(false)} 
         >
             <div 
                 style={{ 
                     backgroundColor: 'white', padding: '25px', borderRadius: '12px', width: '350px', 
                     boxShadow: '0 4px 20px rgba(0,0,0,0.2)' 
                 }}
-                onClick={(e) => e.stopPropagation()} // PREVENT CLOSE ON CLICK INSIDE
+                onClick={(e) => e.stopPropagation()} 
             >
                 <h3 style={{ margin: '0 0 15px 0', color: '#111827' }}>Edit Shipment</h3>
                 

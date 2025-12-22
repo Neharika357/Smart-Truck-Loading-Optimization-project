@@ -95,7 +95,6 @@ function ResetPassword() {
 
       setSuccess(true);
       
-      // Auto redirect after 2 seconds
       setTimeout(() => {
         navigate('/auth/login');
       }, 3000);

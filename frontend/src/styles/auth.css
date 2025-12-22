@@ -1,4 +1,4 @@
-/* --- Global Variables & Reset --- */
+
 :root {
   --primary-color: #16a34a;
   --primary-hover: #15803d;
@@ -11,8 +11,6 @@
   --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
-* { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -24,7 +22,6 @@
 
 .signup-container { width: 100%; max-width: 650px; }
 
-/* --- Progress Indicator --- */
 .step-indicator-container {
   display: flex;
   justify-content: center;
@@ -71,7 +68,6 @@
   background: var(--primary-color);
 }
 
-/* --- Typography --- */
 .auth-header { text-align: center; margin-bottom: 2rem; }
 .system-title { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; font-family: var(--font-family);}
 .system-subtitle { font-size: 0.95rem; color: var(--text-muted); }
@@ -84,7 +80,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* --- Card & Forms --- */
 .auth-card {
   background: var(--card-bg);
   padding: 3rem;
@@ -112,7 +107,6 @@
 
 .auth-form-spacing { display: flex; flex-direction: column; gap: 1.25rem; max-width: 450px; margin: 0 auto; }
 
-/* Keep your requested input styling */
 .input2-group { display: flex; flex-direction: column; }
 .input2-label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem; }
 .input2-field {

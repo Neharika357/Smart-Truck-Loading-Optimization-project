@@ -4,8 +4,6 @@ import { z } from 'zod';
 import '../styles/auth.css'
 
 const register = async (userData) => {
-  // 🔥 IMPORTANT FIX:
-  // Convert single serviceArea string → array for backend
   const payload = {
       ...userData
     };
@@ -153,7 +151,6 @@ const handleNextStep = (e) => {
   setErrors({});
   setApiError('');
 
-  // 1. Validate the specific schema based on role
   const schema = formData.role === 'warehouse' ? warehouseSchema : dealerSchema;
   const result = schema.safeParse(formData);
 
@@ -163,10 +160,9 @@ const handleNextStep = (e) => {
       fieldErrors[issue.path[0]] = issue.message;
     });
     setErrors(fieldErrors);
-    return; // Stop here if validation fails
+    return; 
   }
 
-  // 2. Prepare Payload
   const payload = {
     fullName: formData.fullName,
     email: formData.email,

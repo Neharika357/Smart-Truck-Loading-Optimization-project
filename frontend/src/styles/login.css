@@ -1,4 +1,4 @@
-/* --- Global Variables & Reset --- */
+
 :root {
   --primary-color: #16a34a;
   --primary-hover: #15803d;
@@ -12,14 +12,6 @@
   --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
-* {
-  box-sizing: border-box;
-  font-family: 'Inter', -apple-system, sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-/* --- Layouts --- */
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -29,14 +21,12 @@
   padding: 20px;
 }
 
-/* Signup container is wider for Step 1 role selection */
 .signup-container {
   width: 100%;
   max-width: 650px;
   animation: fadeIn 0.6s ease-out;
 }
 
-/* Auth container for login/reset (Step 2 & 3 will feel centered here) */
 .auth-container {
   width: 100%;
   max-width: 480px;
@@ -48,7 +38,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- System Headings --- */
 .auth-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -67,7 +56,6 @@
   color: var(--text-muted);
 }
 
-/* --- Card Styling --- */
 .auth-card {
   background: var(--card-bg);
   padding: 2.5rem;
@@ -84,7 +72,6 @@
   margin-bottom: 2rem;
 }
 
-/* --- Role Selection (Step 1) --- */
 .role-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -129,7 +116,6 @@
   line-height: 1.4;
 }
 
-/* --- Form Elements (Shared Steps 2 & 3) --- */
 .auth-form-spacing {
   display: flex;
   flex-direction: column;
@@ -179,7 +165,6 @@
   font-weight: 500;
 }
 
-/* --- Buttons --- */
 .btn-primary-custom {
   width: 100%;
   padding: 0.9rem;
@@ -203,7 +188,6 @@
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
 }
 
-/* --- Footer & Links --- */
 .auth-footer {
   margin-top: 2rem;
   text-align: center;
@@ -232,7 +216,6 @@
   text-align: center;
 }
 
-/* --- Spinner --- */
 .spinner-icon {
   width: 18px;
   height: 18px;
@@ -247,7 +230,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* --- Mobile Adjustments --- */
 @media (max-width: 600px) {
   .role-grid {
     grid-template-columns: 1fr;

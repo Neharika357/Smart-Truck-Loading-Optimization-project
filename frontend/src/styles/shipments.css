@@ -21,7 +21,6 @@ body {
   margin: 0 auto;
 }
 
-/* --- 1. LEFT SIDE FORM (Interactive Hover) --- */
 .card-box {
   background: var(--white);
   border-radius: 12px;
@@ -29,17 +28,15 @@ body {
   padding: 30px;
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
-  height: fit-content; /* Ensures it hugs content */
+  height: fit-content; 
 }
 
-/* HOVER EFFECT: Lifts up */
 .card-box:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15);
   border-color: var(--primary-green);
 }
 
-/* --- 2. RIGHT SIDE CONTAINER (THE FIX IS HERE) --- */
 .fleet-box {
   background: var(--white);
   border-radius: 16px;
@@ -47,7 +44,6 @@ body {
   border: 1px solid var(--border-color);
   overflow: hidden;
   
-  /* FIXED: Box grows/shrinks automatically now */
   height: fit-content; 
   min-height: 300px; 
   
@@ -65,7 +61,6 @@ body {
   align-items: center;
 }
 
-/* --- 4. SHIPMENT CARDS (Inner Items) --- */
 .shipment-card {
   background: white;
   border: 1px solid var(--border-color);
@@ -86,7 +81,6 @@ body {
   border-color: var(--primary-green);
 }
 
-/* --- 5. STATS BADGES (Gray Boxes) --- */
 .stat-badge {
   background-color: #f3f4f6;
   padding: 6px 12px;
@@ -100,7 +94,6 @@ body {
   min-width: 80px; 
 }
 
-/* --- 6. BUTTONS --- */
 .btn-primary {
   background-color: var(--primary-green);
   color: white;
@@ -116,7 +109,6 @@ body {
   background-color: var(--dark-green);
 }
 
-/* --- MODAL & NOTIFICATIONS (Unchanged) --- */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; display: flex; justify-content: center; align-items: center; }
 .modal-content { background: white; width: 90%; max-width: 900px; border-radius: 12px; padding: 30px; max-height: 85vh; display: flex; flex-direction: column; }
 .close-btn { position: absolute; top: 20px; right: 25px; border: none; background: none; font-size: 24px; color: #9ca3af; cursor: pointer; }
@@ -127,7 +119,6 @@ body {
 .notif-item { padding: 15px 20px; border-bottom: 1px solid #f3f4f6; font-size: 13px; display: flex; gap: 12px; cursor: pointer; }
 .notif-item:hover { background: #f8fafc; }
 
-/* Reuse the blur logic from the Dealer side */
 .blur-bg.intense {
   backdrop-filter: blur(15px);
   background: rgba(255, 255, 255, 0.4);
@@ -166,12 +157,10 @@ body {
   margin-top: 15px;
 }
 
-/* Success Animation */
 .success-icon-animate {
   animation: scaleUp 0.5s ease;
 }
 
-/* --- FILTER TABS --- */
 .filter-container {
   display: flex;
   gap: 12px;
@@ -199,20 +188,19 @@ body {
 }
 
 .filter-btn.active {
-  background-color: #1b4332; /* Primary Green */
+  background-color: #1b4332; 
   color: white;
   box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
 }
-/* --- NEW FILTER TABS --- */
 .filter-tabs-row {
     display: flex;
     gap: 8px;
-    margin:18px 5px 15px 10px; /* Spacing between header and list */
+    margin:18px 5px 15px 10px; 
     padding: 0 5px;
 }
 
 .filter-tab {
-    background: #f3f4f6; /* Light gray background */
+    background: #f3f4f6;
     border: none;
     padding: 6px 14px;
     border-radius: 20px;
@@ -229,7 +217,7 @@ body {
 }
 
 .filter-tab.active {
-    background:#1b4332; /* Your Primary Green */
+    background:#1b4332; 
     color: white;
     box-shadow: 0 2px 4px rgba(45, 106, 79, 0.3);
 }

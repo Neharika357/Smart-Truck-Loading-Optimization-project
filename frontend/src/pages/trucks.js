@@ -11,7 +11,6 @@ const TruckDashboard = () => {
   const [statusFilter, setStatusFilter] = useState('All'); 
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   
-  // --- EDIT MODAL STATE ---
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTruck, setEditingTruck] = useState(null);
 
@@ -47,7 +46,6 @@ const TruckDashboard = () => {
       return () => clearInterval(interval);
   }, []);
 
-  // --- DELETE FUNCTION ---
   const handleDelete = async (truckId) => {
     if (!window.confirm("Are you sure you want to delete this truck?")) return;
     try {
@@ -61,7 +59,6 @@ const TruckDashboard = () => {
     }
   };
 
-  // --- EDIT FUNCTIONS ---
   const openEditModal = (truck) => {
     setEditingTruck({ ...truck }); 
     setIsEditModalOpen(true);
@@ -337,15 +334,14 @@ const TruckDashboard = () => {
         </div>
       )}
 
-      {/* --- STATUS MODAL (Click Outside to Close) --- */}
       {isStatusDialogOpen && (
         <div 
             className="modal-overlay blur-bg"
-            onClick={() => setIsStatusDialogOpen(false)} // CLOSE ON CLICK OUTSIDE
+            onClick={() => setIsStatusDialogOpen(false)} 
         >
           <div 
             className="glass-card status-dialog"
-            onClick={(e) => e.stopPropagation()} // PREVENT CLOSE ON CLICK INSIDE
+            onClick={(e) => e.stopPropagation()}
           >
             <h3>Update Delivery Status</h3>
             <p>Current: <strong>{selectedTruck?.status}</strong></p>

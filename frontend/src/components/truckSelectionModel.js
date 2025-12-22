@@ -49,9 +49,6 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
                 <h3 style={{ margin: '0 0 5px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FaTruck color="#4b5563"/> {truck.truckId}
                 </h3>
-                {/* <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '15px' }}>
-                  by {truck.dealer} <span style={{ color: '#fbbf24' }}>★ {truck.rating}</span>
-                </div> */}
               </div>
 
               <div style={styles.statsGrid}>

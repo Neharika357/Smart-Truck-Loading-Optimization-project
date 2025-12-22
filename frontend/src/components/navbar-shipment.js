@@ -21,7 +21,7 @@ const Navbar = ({username}) => {
             id: order._id,
             sid: order.sid,
             tid: order.tid,
-            status: order.status, // Requested, Assigned, In Transit, etc.
+            status: order.status,
             time: new Date(order.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }));
             setNotifications(formattedNotifs);
@@ -75,7 +75,6 @@ const Navbar = ({username}) => {
             navigate(`/warehouse/${username}`);
         } else {
             console.error("Username is missing, cannot navigate");
-            // Optionally redirect to login or home
         }
     };
 
