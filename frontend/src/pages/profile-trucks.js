@@ -114,7 +114,7 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <button className="edit-profile-btn">Edit Profile</button>
+          {/* <button className="edit-profile-btn">Edit Profile</button> */}
         </header>
 
         <section className="dashboard-grid-row">

@@ -126,7 +126,7 @@ const WarehouseProfile = () => {
               </div>
             </div>
           </div>
-          <button className="edit-profile-btn">Manage Account</button>
+          {/* <button className="edit-profile-btn">Manage Account</button> */}
         </header>
 
         {/* 3 STAT BOXES */}

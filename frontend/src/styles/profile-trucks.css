@@ -137,9 +137,12 @@
 /* Table Improvements */
 
 .status-pill-pro { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
-.status-pill-pro.assigned { background: #c6f6d5; color: #22543d; }
-.status-pill-pro.in-transit { background: #feebc8; color: #744210; }
-.status-pill-pro.delivered { background: #bee3f8; color: #2c5282; }
+
+/* UPDATED COLORS TO MATCH NAVBAR */
+.status-pill-pro.requested { background: #f3e8ff; color: #7e22ce; } /* Violet */
+.status-pill-pro.assigned { background: #f0fff4; color: #2f855a; }   /* Green */
+.status-pill-pro.in-transit { background: #fffaf0; color: #9c4221; } /* Orange */
+.status-pill-pro.delivered { background: #dcfce7; color: #166534; }  /* Green */
 
 .view-all-trigger { background: none; border: none; color: var(--primary); font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: gap 0.2s; }
 .view-all-trigger:hover { gap: 8px; }
@@ -195,7 +198,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 8px;
-  table-layout: fixed; /* Ensures consistent column widths */
+  table-layout: fixed; 
 }
 
 .pro-table th {
@@ -204,8 +207,8 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 12px 15px;
-  text-align: middle;
-  vertical-align: middle; /* Aligns header text */
+  text-align: center;
+  vertical-align: middle; 
 }
 
 .pro-table td {
@@ -213,8 +216,8 @@
   padding-left: 60px;
   padding-right: 30px;
   background: var(--white);
-  vertical-align: middle; /* Aligns cell content to center of row */
-  text-align: middle;
+  vertical-align: middle; 
+  text-align: center;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -222,7 +225,8 @@
 /* Specific Cell Alignments */
 .status-container {
   display: flex;
-  align-items: center; /* Centers pill vertically in the cell */
+  align-items: center; 
+  justify-content: center;
   height: 100%;
 }
 
