@@ -19,7 +19,7 @@ const Navbar = ({username})=> {
 
     const fetchNotifs = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/dealer-requests/${activeDealer}`);
+            const res = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/dealer-requests/${activeDealer}`);
             if (res.data) {
                 setNotifications(res.data);
             }
@@ -37,8 +37,8 @@ const Navbar = ({username})=> {
     const handleVerifyClick = async (notif) => {
         try {
             const [shipmentRes, truckRes] = await Promise.all([
-                axios.get(`http://localhost:5000/shipment-details/${notif.sid}`),
-                axios.get(`http://localhost:5000/truck-details/${notif.tid}`)
+                axios.get(`https://smart-truck-loading-optimization-project.onrender.com/shipment-details/${notif.sid}`),
+                axios.get(`https://smart-truck-loading-optimization-project.onrender.com/truck-details/${notif.tid}`)
             ]);
             
             setShipmentDetails(shipmentRes.data);
@@ -53,7 +53,7 @@ const Navbar = ({username})=> {
         const endpoint = type === 'accept' ? '/accept-order' : '/decline-request';
         
         try {
-            await axios.post(`http://localhost:5000${endpoint}`, { sid, tid });
+            await axios.post(`https://smart-truck-loading-optimization-project.onrender.com${endpoint}`, { sid, tid });
 
             if (type === 'accept') setFeedbackMsg("Thank you for accepting!");
             else setFeedbackMsg("Will inform the shipment owner to find another truck.");
@@ -75,7 +75,7 @@ const Navbar = ({username})=> {
         if (!confirmDelete) return;
 
         try {
-            const res = await axios.delete(`http://localhost:5000/delete-dealer-order-request`, {
+            const res = await axios.delete(`https://smart-truck-loading-optimization-project.onrender.com/delete-dealer-order-request`, {
                 data: { sid, tid , status} 
             });
 

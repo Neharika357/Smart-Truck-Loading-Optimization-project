@@ -12,7 +12,7 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
   const handleDelete = async (sid) => {
     if (!window.confirm("Are you sure? This will delete the shipment and cancel any requests.")) return;
     try {
-      await axios.delete(`http://localhost:5000/delete-shipment/${sid}`);
+      await axios.delete(`https://smart-truck-loading-optimization-project.onrender.com/delete-shipment/${sid}`);
       window.location.reload(); 
     } catch (err) {
       alert("Failed to delete shipment");
@@ -27,7 +27,7 @@ const ShipmentList = ({ shipments, onFindTruck, filterStatus, setFilterStatus })
 
   const handleSaveEdit = async () => {
     try {
-      await axios.put(`http://localhost:5000/update-shipment/${editData.sid}`, editData);
+      await axios.put(`https://smart-truck-loading-optimization-project.onrender.com/update-shipment/${editData.sid}`, editData);
       setIsEditOpen(false);
       window.location.reload(); 
     } catch (err) {

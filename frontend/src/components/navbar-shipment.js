@@ -14,7 +14,7 @@ const Navbar = ({username}) => {
 
     const fetchNotifications = async () => {
         try {
-        const response = await fetch(`http://localhost:5000/warehouse-orders/${CURRENT_USER}`);
+        const response = await fetch(`https://smart-truck-loading-optimization-project.onrender.com/warehouse-orders/${CURRENT_USER}`);
         const data = await response.json();
         if (response.ok) {
             const formattedNotifs = data.map(order => ({
@@ -36,7 +36,7 @@ const Navbar = ({username}) => {
         if (!confirmDelete) return;
 
         try {
-            const res = await axios.delete(`http://localhost:5000/delete-warehouse-order-request`, {
+            const res = await axios.delete(`https://smart-truck-loading-optimization-project.onrender.com/delete-warehouse-order-request`, {
                 data: { sid, tid, status } 
             });
 

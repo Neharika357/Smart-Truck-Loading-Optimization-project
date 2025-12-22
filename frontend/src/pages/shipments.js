@@ -24,7 +24,7 @@ const WarehouseDashboard = () => {
 
   const fetchShipments = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-shipments', {
+      const response = await fetch('https://smart-truck-loading-optimization-project.onrender.com/get-shipments', {
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: CURRENT_USER }) 
@@ -54,7 +54,7 @@ const WarehouseDashboard = () => {
 
   const checkForUpdates = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get-shipments', {
+      const response = await fetch('https://smart-truck-loading-optimization-project.onrender.com/get-shipments', {
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: CURRENT_USER }) 
@@ -80,7 +80,7 @@ const WarehouseDashboard = () => {
 
   const handleAddShipment = async (formData) => {
     try {
-        const response = await fetch('http://localhost:5000/create-shipment', {
+        const response = await fetch('https://smart-truck-loading-optimization-project.onrender.com/create-shipment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -105,7 +105,7 @@ const WarehouseDashboard = () => {
      const bookingData = { sid: modalData.id, tid: truckId };
 
      try {
-       const response = await fetch('http://localhost:5000/request-truck', {
+       const response = await fetch('https://smart-truck-loading-optimization-project.onrender.com/request-truck', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(bookingData)

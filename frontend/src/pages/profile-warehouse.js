@@ -39,15 +39,15 @@ const WarehouseProfile = () => {
         setLoading(true);
         
         // 1. Fetch Warehouse User Details (Email)
-        const userRes = await axios.get(`http://localhost:5000/user/${CURRENT_USER}`);
+        const userRes = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/user/${CURRENT_USER}`);
         const userData = userRes.data[0];
 
         // 2. Fetch All Shipments for Stats
-        const shipmentRes = await axios.post('http://localhost:5000/get-shipments', { username: CURRENT_USER });
+        const shipmentRes = await axios.post('https://smart-truck-loading-optimization-project.onrender.com/get-shipments', { username: CURRENT_USER });
         const shipments = shipmentRes.data;
 
         // 3. Fetch Accepted Orders for Activity Logs
-        const logsRes = await axios.get(`http://localhost:5000/accepted-orders/warehouse/${CURRENT_USER}`);
+        const logsRes = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/accepted-orders/warehouse/${CURRENT_USER}`);
         const logs = logsRes.data;
 
         // --- Logic: Calculate Stat Boxes ---
@@ -88,8 +88,8 @@ const WarehouseProfile = () => {
     setModalLoading(true);
     try {
       const [shipRes, truckRes] = await Promise.all([
-        axios.get(`http://localhost:5000/shipment-details/${order.sid}`),
-        axios.get(`http://localhost:5000/truck-details/${order.tid}`)
+        axios.get(`https://smart-truck-loading-optimization-project.onrender.com/shipment-details/${order.sid}`),
+        axios.get(`https://smart-truck-loading-optimization-project.onrender.com/truck-details/${order.tid}`)
       ]);
       setSelectedOrder({
         ...order,

@@ -26,7 +26,7 @@ const TruckDashboard = () => {
 
   const fetchTrucks = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/truck`, {
+        const response = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/truck`, {
             params: { username: username }
         });
         setTrucks(response.data);
@@ -49,7 +49,7 @@ const TruckDashboard = () => {
   const handleDelete = async (truckId) => {
     if (!window.confirm("Are you sure you want to delete this truck?")) return;
     try {
-        await axios.delete(`http://localhost:5000/delete-truck/${truckId}`);
+        await axios.delete(`https://smart-truck-loading-optimization-project.onrender.com/delete-truck/${truckId}`);
         setTrucks(trucks.filter(t => t.truckId !== truckId));
         setSuccessMessage({ title: "Deleted!", sub: "Truck removed from fleet" });
         setShowSuccess(true);
@@ -66,7 +66,7 @@ const TruckDashboard = () => {
 
   const handleSaveEdit = async () => {
     try {
-        await axios.put(`http://localhost:5000/update-truck/${editingTruck.truckId}`, editingTruck);
+        await axios.put(`https://smart-truck-loading-optimization-project.onrender.com/update-truck/${editingTruck.truckId}`, editingTruck);
         setTrucks(trucks.map(t => (t.truckId === editingTruck.truckId ? editingTruck : t)));
         setIsEditModalOpen(false);
         setSuccessMessage({ title: "Updated!", sub: "Truck details saved successfully" });
@@ -80,7 +80,7 @@ const TruckDashboard = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/create-truck', {
+      const response = await axios.post('https://smart-truck-loading-optimization-project.onrender.com/create-truck', {
         ...formData,
         username: username
       });
@@ -112,7 +112,7 @@ const TruckDashboard = () => {
   const handleStatusChange = async (newStatus) => {
     if (!selectedTruck) return;
     try {
-        await axios.post('http://localhost:5000/update-truck-status', {
+        await axios.post('https://smart-truck-loading-optimization-project.onrender.com/update-truck-status', {
         tid: selectedTruck.truckId,
         sid: selectedTruck.assignedShipment, 
         status: newStatus

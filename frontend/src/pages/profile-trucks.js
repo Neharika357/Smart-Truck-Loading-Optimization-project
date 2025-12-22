@@ -31,13 +31,13 @@ const Profile = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        const dealerRes = await axios.get(`http://localhost:5000/truckdealer/${CURRENT_USER}`);
+        const dealerRes = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/truckdealer/${CURRENT_USER}`);
         const dealerData = dealerRes.data[0];
 
-        const truckRes = await axios.get(`http://localhost:5000/truck?username=${CURRENT_USER}`);
+        const truckRes = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/truck?username=${CURRENT_USER}`);
         const trucks = truckRes.data;
 
-        const orderRes = await axios.get(`http://localhost:5000/accepted-orders/dealer/${CURRENT_USER}`);
+        const orderRes = await axios.get(`https://smart-truck-loading-optimization-project.onrender.com/accepted-orders/dealer/${CURRENT_USER}`);
         const orders = orderRes.data;
 
         const composition = trucks.reduce((acc, truck) => {
@@ -77,8 +77,8 @@ const Profile = () => {
     setModalLoading(true);
     try {
       const [shipRes, truckRes] = await Promise.all([
-        axios.get(`http://localhost:5000/shipment-details/${order.sid}`),
-        axios.get(`http://localhost:5000/truck-details/${order.tid}`)
+        axios.get(`https://smart-truck-loading-optimization-project.onrender.com/shipment-details/${order.sid}`),
+        axios.get(`https://smart-truck-loading-optimization-project.onrender.com/truck-details/${order.tid}`)
       ]);
       setSelectedOrder({
         ...order,

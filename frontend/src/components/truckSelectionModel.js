@@ -10,7 +10,7 @@ const TruckSelectionModal = ({ shipmentData, onClose, onBook }) => {
   useEffect(() => {
     const fetchAndOptimize = async () => {
       try {
-        const response = await fetch('http://localhost:5000/available-trucks');
+        const response = await fetch('https://smart-truck-loading-optimization-project.onrender.com/available-trucks');
         const allTrucks = await response.json();
         const optimized = getOptimizedTrucks(shipmentData, allTrucks); // Using Core Logic
         setSuggestedTrucks(optimized);
