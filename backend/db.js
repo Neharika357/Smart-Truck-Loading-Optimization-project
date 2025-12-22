@@ -358,6 +358,7 @@ app.post('/accept-order', async (req, res) => {
         const newOrder = new ShipmentOrder({
             sid:sid,
             tid:tid,
+            warehouse: shipmentDoc.warehouseUser,
             status:"Assigned"
         });
         await newOrder.save();
