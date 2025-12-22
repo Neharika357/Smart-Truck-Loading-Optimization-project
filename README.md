@@ -17,7 +17,7 @@ If you just want to see the application in action, you can run the frontend loca
 
 ```bash
 git clone https://github.com/your-username/optitruck-connect.git
-cd optitruck-connect
+cd smart-truck
 
 ```
 
