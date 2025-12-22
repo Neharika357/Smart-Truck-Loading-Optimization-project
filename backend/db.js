@@ -1,4 +1,3 @@
-require('dotenv').config();
 var express = require('express')
 var TruckDealer = require('./models/TruckDealer.js')
 var TrucksInfo = require('./models/TrucksInfo.js')
@@ -12,10 +11,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 var app = express();
-app.use(cors);
+app.use(cors()); 
 app.use(express.json());
 
-var url = process.env.MONGO_URI;
+var url = "mongodb+srv://clpro_123:Pramodha123@cluster0.k9kjmxq.mongodb.net/SmartTruckDB?retryWrites=true&w=majority";
 mongoose.connect(url)
 .then((res)=> console.log('Connected to db'))
 .catch((err) => console.log(err));
