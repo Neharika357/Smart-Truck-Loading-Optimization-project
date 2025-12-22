@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express')
 var TruckDealer = require('./models/TruckDealer.js')
 var TrucksInfo = require('./models/TrucksInfo.js')
@@ -11,13 +12,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 var app = express();
-app.use(cors({
-  origin: "http://localhost:3000",  
-  credentials: true                 
-}));
+app.use(cors);
 app.use(express.json());
 
-var url = "mongodb+srv://clpro_123:Pramodha123@cluster0.k9kjmxq.mongodb.net/SmartTruckDB?retryWrites=true&w=majority";
+var url = process.env.MONGO_URI;
 mongoose.connect(url)
 .then((res)=> console.log('Connected to db'))
 .catch((err) => console.log(err));
@@ -476,7 +474,7 @@ app.get('/accepted-orders/:role/:username', async (req, res) => {
 
 app.delete('/delete-warehouse-order-request', async (req, res) => {
     try {
-        const { sid, tid, status } = req.body; // Added status here
+        const { sid, tid, status } = req.body; 
 
         if (!sid || !tid || !status) {
             return res.status(400).json({ error: "Missing sid, tid, or status for deletion" });
@@ -503,7 +501,7 @@ app.delete('/delete-warehouse-order-request', async (req, res) => {
 
 app.delete('/delete-dealer-order-request', async (req, res) => {
     try {
-        const { sid, tid, status } = req.body; // Added status here
+        const { sid, tid, status } = req.body; 
 
         if (!sid || !tid || !status) {
             return res.status(400).json({ error: "Missing sid, tid, or status for deletion" });
@@ -551,18 +549,15 @@ app.get('/user/:username', async(req, res) =>{
    
 })
 
-// 1. Update Shipment Details
 app.put('/update-shipment/:sid', async (req, res) => {
     try {
         const { sid } = req.params;
         const updateData = req.body;
 
-        // Protect critical fields: Don't allow changing the ID or the Owner via this route
         delete updateData.sid; 
         delete updateData._id;
         delete updateData.warehouseUser;
 
-        // If updating date, ensure it's formatted correctly
         if (updateData.deadline) {
             updateData.deadline = new Date(updateData.deadline);
         }
@@ -570,7 +565,7 @@ app.put('/update-shipment/:sid', async (req, res) => {
         const updatedShipment = await ShipmentInfo.findOneAndUpdate(
             { sid: sid },
             { $set: updateData },
-            { new: true } // Return the updated document
+            { new: true } 
         );
 
         if (!updatedShipment) {
@@ -585,20 +580,16 @@ app.put('/update-shipment/:sid', async (req, res) => {
     }
 });
 
-// 2. Delete Shipment
 app.delete('/delete-shipment/:sid', async (req, res) => {
     try {
         const { sid } = req.params;
 
-        // A. Delete the Shipment itself
         const deletedShipment = await ShipmentInfo.findOneAndDelete({ sid: sid });
 
         if (!deletedShipment) {
             return res.status(404).json({ error: "Shipment not found" });
         }
 
-        // B. CLEANUP: Delete any related orders/requests for this shipment
-        // This ensures no "Ghost Requests" remain in the system
         await ShipmentOrder.deleteMany({ sid: sid });
         await TruckOrder.deleteMany({ sid: sid });
         await AcceptedOrder.deleteMany({ sid: sid });
@@ -616,7 +607,6 @@ app.put('/update-truck/:truckId', async (req, res) => {
         const { truckId } = req.params;
         const updateData = req.body;
 
-        // Protect critical fields
         delete updateData.truckId;
         delete updateData._id;
         delete updateData.dealerId;
@@ -639,30 +629,18 @@ app.put('/update-truck/:truckId', async (req, res) => {
     }
 });
 
-// 4. Delete Truck
 app.delete('/delete-truck/:truckId', async (req, res) => {
     try {
         const { truckId } = req.params;
 
-        // A. Check if truck is currently busy (Optional safety check)
-        // const truck = await TrucksInfo.findOne({ truckId });
-        // if (truck && truck.status === "In Use") {
-        //     return res.status(400).json({ error: "Cannot delete a truck that is currently delivering an order." });
-        // }
-
-        // B. Delete the Truck
         const deletedTruck = await TrucksInfo.findOneAndDelete({ truckId: truckId });
 
         if (!deletedTruck) {
             return res.status(404).json({ error: "Truck not found" });
         }
 
-        // C. CLEANUP: Delete related orders/requests
-        // Remove requests from Dealer view
         await TruckOrder.deleteMany({ tid: truckId });
-        // Remove accepted orders
         await AcceptedOrder.deleteMany({ tid: truckId });
-        // Remove requests from Warehouse view (so they don't see a requested truck that no longer exists)
         await ShipmentOrder.deleteMany({ tid: truckId });
 
         console.log(`Truck ${truckId} and all related records deleted`);
