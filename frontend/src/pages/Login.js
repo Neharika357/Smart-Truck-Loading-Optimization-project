@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
-import '../styles/auth.css'
+import '../styles/login.css'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -33,12 +33,10 @@ function PrimaryButton({ children, loading, disabled, type = 'button', className
     <button
       type={type}
       disabled={isDisabled}
-      className={`w-full inline-flex items-center justify-center px-4 py-3 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 shadow-md hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`btn-primary-custom ${className}`}
       {...rest}
     >
-      {loading && (
-        <span className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      )}
+      {loading && <span className="spinner-icon" />}
       {children}
     </button>
   );
@@ -54,21 +52,17 @@ function TextInput({
   error,
 }) {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
+    <div className="input2-group">
+      <label htmlFor={id} className="input2-label">{label}</label>
       <input
         id={id}
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 border rounded-lg outline-none transition-all focus:ring-2 focus:border-green-500 focus:ring-green-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        className={`input2-field ${error ? 'input2-error' : ''}`}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="error-text">{error}</p>}
     </div>
   );
 }
@@ -119,23 +113,52 @@ function Login() {
   };
 
   return (
-    <div>
-      <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Sign In</h3>
-      {apiError && <p className="mb-3 text-sm text-red-600 bg-red-50 p-2 rounded">{apiError}</p>}
-      
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <TextInput id="login-email" label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={errors.email} />
-        <TextInput id="login-password" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
-        
-        <div className="text-right">
-            <Link to="/auth/forgot-password" className="text-sm text-green-600 hover:underline">Forgot Password?</Link>
+    <div className="auth-page">
+      <div className="auth-container">
+        {/* Main System Heading */}
+        <div className="auth-header">
+          <h1 className="system-title">Smart Truck Loading Optimization System</h1>
+          <p className="system-subtitle">Connect warehouses and truck dealers for efficient logistics</p>
         </div>
-        
-        <PrimaryButton type="submit" loading={loading}>Login</PrimaryButton>
-      </form>
-      
-      <div className="mt-6 text-center text-sm text-gray-600">
-        Don't have an account? <Link to="/" className="text-green-600 font-bold hover:underline">Sign up</Link>
+
+        {/* Login Card */}
+        <div className="auth-card">
+          <h2 className="auth-title">Login</h2>
+          
+          {apiError && <div className="api-error-alert">{apiError}</div>}
+          
+          <form onSubmit={handleSubmit} className="auth-form-spacing">
+            <TextInput 
+              id="login-email" 
+              label="Email" 
+              type="email" 
+              placeholder="you@company.com"
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              error={errors.email} 
+            />
+            
+            <TextInput 
+              id="login-password" 
+              label="Password" 
+              type="password" 
+              placeholder="Enter your password"
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              error={errors.password} 
+            />
+            
+            <div className="forgot-password-link">
+              <Link to="/auth/forgot-password">Forgot Password?</Link>
+            </div>
+            
+            <PrimaryButton type="submit" loading={loading}>Login</PrimaryButton>
+          </form>
+          
+          <div className="auth-footer">
+            Don't have an account? <Link to="/" className="link-bold">Sign up</Link>
+          </div>
+        </div>
       </div>
     </div>
   );
