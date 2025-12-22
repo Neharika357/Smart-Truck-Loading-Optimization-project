@@ -115,23 +115,16 @@
   padding: 2px 5px; border-radius: 50%;
 }
 
-.verify-btn {
-  align-self: flex-start; background: var(--mint); border: none;
-  padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;
-  font-weight: bold; cursor: pointer; color: var(--forest);
-}
-
 /* Background Blurring Overlay */
 .blur-bg {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(8px); /* The requested blur effect */
+  backdrop-filter: blur(8px);
   display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 
 .blur-bg.intense { backdrop-filter: blur(15px); background: rgba(0,0,0,0.1); }
 
-/* Scrollable Large Dialog */
 /* Verification Detail Box */
 .verification-box { width: 500px; animation: popIn 0.3s ease; }
 .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
@@ -183,101 +176,39 @@
 
 /* Scrollable Area */
 .notif-scroll-area {
-  max-height: 450px; /* High enough for multiple notifs but contained */
+  max-height: 450px;
   overflow-y: auto;
   padding: 0 15px;
 }
 
-/* Clean Custom Scrollbar */
-.notif-scroll-area::-webkit-scrollbar {
-  width: 5px;
-}
-.notif-scroll-area::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 10px;
-}
-
-.notif-item {
-  padding: 15px 0;
-  border-bottom: 1px solid #f8faf9;
-}
-
-.notif-item:last-child {
-  border-bottom: none;
-}
-
-.notif-item p {
-  font-size: 0.85rem;
-  margin-bottom: 10px;
-  color: #4a5568;
-}
+.notif-scroll-area::-webkit-scrollbar { width: 5px; }
+.notif-scroll-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.notif-item {
-    border-left: 4px solid #cbd5e0;
-    padding: 12px;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    position: relative
-}
-
-/* Status specific colors */
-.notif-item.requested { border-left-color: #3182ce; }
-.notif-item.assigned { border-left-color: #38a169; }
-.notif-item.in.transit { border-left-color: #ecc94b; }
-.notif-item.delivered { border-left-color: #805ad5; }
-
-.notif-item {
-    position: relative; /* Anchor for the badge */
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 4px solid #4a5568;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 12px;
-}
-
-.notif-content {
-    padding-right: 70px; /* Space to prevent text overlap with badge */
-}
-
-.shipment-subtext {
-    font-size: 0.75rem;
-    color: #718096;
-    margin-top: 5px;
-    display: block;
-}
+/* =========================================
+   UPDATED NOTIFICATION ITEM STYLING
+   ========================================= */
 
 .notif-item {
     position: relative; 
     background: rgba(255, 255, 255, 0.05);
     border-left: 4px solid #4a5568;
     border-radius: 12px;
-    padding: 20px 16px 16px 16px; 
+    
+    /* ADDED: Extra bottom padding to make room for the "Verify" button */
+    padding: 20px 16px 45px 16px; 
+    
     margin-bottom: 12px;
     transition: all 0.2s ease;
 }
 
-.status-badge-corner {
-    position: absolute;
-    top: 10px;
-    right: -10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.notif-item:last-child {
+  margin-bottom: 0;
 }
-
-/* Status Colors */
-.status-badge-corner.requested { background: #ebf8ff; color: #2b6cb0; }
-.status-badge-corner.assigned, 
-.status-badge-corner.accepted { background: #f0fff4; color: #2f855a; }
-.status-badge-corner.pending { background: #fffaf0; color: #9c4221; }
 
 .notif-body {
     display: flex;
@@ -287,7 +218,7 @@
 }
 
 .notif-text {
-    flex: 1; /* Takes up remaining space */
+    flex: 1; 
 }
 
 .notif-text p {
@@ -297,7 +228,23 @@
     line-height: 1.4;
 }
 
+.shipment-subtext {
+    font-size: 0.75rem;
+    color: #718096;
+    display: block;
+    margin-top: 4px;
+}
+
+/* =========================================
+   UPDATED "VERIFY" BUTTON POSITIONING
+   ========================================= */
+
 .verify-btn {
+    /* Absolute Positioning to bottom-right */
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    
     background: #2d6a4f;
     color: white;
     border: none;
@@ -307,24 +254,43 @@
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap; 
+    z-index: 10;
 }
 
 .verify-btn:hover {
     background: #40916c;
 }
 
-.shipment-subtext {
-    font-size: 0.75rem;
-    color: #718096;
-    display: block;
-    margin-top: 4px;
+/* =========================================
+   UPDATED STATUS BADGE COLORS
+   ========================================= */
+
+.status-badge-corner {
+    position: absolute;
+    top: 10px;
+    right: -10px; /* Slight overhang looks nice */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.notif-item {
-    position: relative; /* Essential for positioning the icon */
-    transition: background 0.2s ease;
-}
+.status-badge-corner.requested { background: #f3e8ff; color: #7e22ce; } /* Violet */
+.status-badge-corner.assigned  { background: #f0fff4; color: #2f855a; } /* Green */
+.status-badge-corner.accepted  { background: #e0f2fe; color: #0369a1; } /* Blue */
+.status-badge-corner.in-transit{ background: #fffaf0; color: #9c4221; } /* Orange */
+.status-badge-corner.delivered { background: #dcfce7; color: #166534; } /* Green */
+.status-badge-corner.pending   { background: #fffaf0; color: #9c4221; } 
 
+/* Status specific colors for the Notification Item Border */
+.notif-item.requested { border-left-color: #7e22ce; }
+.notif-item.assigned { border-left-color: #38a169; }
+.notif-item.in-transit { border-left-color: #ecc94b; }
+.notif-item.delivered { border-left-color: #805ad5; }
+
+/* Delete Trigger (Trash Icon) - Also Bottom Right */
 .delete-trigger {
     position: absolute;
     bottom: 8px;
@@ -338,13 +304,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0; /* Hidden by default */
+    opacity: 0; 
     transform: translateY(5px);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .notif-item:hover .delete-trigger {
-    opacity: 1; /* Show on hover */
+    opacity: 1; 
     transform: translateY(0);
 }
 
@@ -352,9 +318,4 @@
     background: #ef4444;
     color: white;
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-}
-
-.status-badge-corner.delivered {
-    background: #dcfce7;
-    color: #166534;
 }

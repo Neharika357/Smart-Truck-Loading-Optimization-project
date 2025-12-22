@@ -85,7 +85,7 @@ const Navbar = ({username}) => {
                 
                 <div className="nav-brand" onClick={() =>handleBrandClick()} style={{cursor: 'pointer'}}>
                     <div className="logo-icon"><Truck size={24} color="white" /></div>
-                    <span>SmartTruck <small>Optimizer</small></span>
+                    <span>OptiTruckConnect</span>
                 </div>
                 
                 <div className="nav-actions">
@@ -135,7 +135,13 @@ const Navbar = ({username}) => {
 
                         <User size={20} className="action-icon" onClick={() => navigate(`/user/${username}`)} />
                         
-                        <button className="logout-pill"><LogOut size={16} /> Logout</button>
+                        {/* <button className="logout-pill"><LogOut size={16} /> Logout</button> */}
+                        <button 
+                            className="logout-pill" 
+                            onClick={() => navigate('/')} 
+                        >
+                            <LogOut size={16} /> Logout
+                        </button>
                     </div>
                 </div>
             </div>

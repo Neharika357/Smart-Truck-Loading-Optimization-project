@@ -1,6 +1,6 @@
 /* --- VARIABLES & BASE --- */
 :root {
-  --primary: #10b981; /* Changed to Green to match your Warehouse theme */
+  --primary: #10b981; /* Green for Warehouse */
   --primary-light: #d1fae5;
   --dark: #064e3b;
   --text-main: #1f2937;
@@ -185,36 +185,42 @@ body {
 /* --- STATUS PILLS --- */
 .status-pill-pro { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-block; }
 
-/* Warehouse Specific Status Colors */
-.status-pill-pro.processing { background: #feebc8; color: #744210; } /* Orange */
-.status-pill-pro.stored { background: #e9d8fd; color: #553c9a; } /* Purple */
-.status-pill-pro.inbound { background: #bee3f8; color: #2c5282; } /* Blue */
-.status-pill-pro.dispatched { background: #c6f6d5; color: #22543d; } /* Green */
-/* --- Add these to the bottom of profile-warehouse.css --- */
+/* =========================================
+   UPDATED STATUS COLORS (Violet, Green, Blue, Orange)
+   ========================================= */
 
-/* --- Paste this at the bottom of profile-warehouse.css --- */
-
-/* 1. Requested / Pending (Bold Dark Orange) */
-.status-pill-pro.requested, 
-.status-pill-pro.pending {
-    background-color: #feebc8;
-    color: #744210;             /* Dark, bold Orange */
-    border: 1px solid #ffedd5;
-    font-size: 0.75rem; font-weight: 800       /* BOLD */
+/* 1. Requested (Violet) */
+.status-pill-pro.requested { 
+    background: #f3e8ff; 
+    color: #7e22ce; 
+    border: 1px solid #e9d5ff;
 }
 
-/* 2. Assigned (Bold Dark Blue) */
+/* 2. Assigned (Green) */
 .status-pill-pro.assigned {
-    background-color:#bee3f8;
-    color:  #2c5282;             /* Dark, bold Blue */
+    background: #f0fff4; 
+    color: #2f855a; 
     border: 1px solid #dbeafe;
-    font-size: 0.75rem; font-weight: 800          /* BOLD */
 }
 
-/* 3. Delivered (Bold Dark Green) */
+/* 3. Accepted (Blue) */
+.status-pill-pro.accepted {
+    background: #e0f2fe; 
+    color: #0369a1; 
+    border: 1px solid #bae6fd;
+}
+
+/* 4. Delivered (Green) */
 .status-pill-pro.delivered {
-    background-color: #c6f6d5;
-    color:  #22543d;             /* Dark, bold Green */
-    border: 1px solid #dcfce7;
-    font-size: 0.75rem; font-weight: 800          /* BOLD */
+    background: #dcfce7; 
+    color: #166534; 
+    border: 1px solid #bbf7d0;
+}
+
+/* 5. Pending / In-Transit (Orange) */
+.status-pill-pro.pending, 
+.status-pill-pro.in-transit {
+    background: #fffaf0; 
+    color: #9c4221; 
+    border: 1px solid #ffedd5;
 }
